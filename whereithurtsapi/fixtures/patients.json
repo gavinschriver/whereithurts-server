@@ -1,0 +1,9 @@
+[
+{
+    "model": "whereithurtsapi.patient",
+    "pk":  1,
+    "fields": {
+        "user": 1
+    }
+  }
+]
