@@ -1,0 +1,30 @@
+[
+    {
+        "model": "whereithurtsapi.treatmenttype",
+        "pk": 1,
+        "fields": {
+           "name": "Misc."
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatmenttype",
+        "pk": 2,
+        "fields": {
+           "name": "Strength and Conditioning"
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatmenttype",
+        "pk": 3,
+        "fields": {
+           "name": "Mobility"
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatmenttype",
+        "pk": 4,
+        "fields": {
+           "name": "Soft Tissue Work"
+        }
+    }
+]

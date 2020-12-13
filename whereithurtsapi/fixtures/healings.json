@@ -1,0 +1,22 @@
+[
+    {
+        "model": "whereithurtsapi.healing",
+        "pk": 1,
+        "fields": {
+           "patient": 1,
+           "notes": "spent most time on right foot",
+           "duration": 840,
+           "added_on": "2020-08-14T14:51:39.989Z"
+        }
+    },
+    {
+        "model": "whereithurtsapi.healing",
+        "pk": 2,
+        "fields": {
+           "patient": 1,
+           "notes": "trying a couple new strength things",
+           "duration": 972,
+           "added_on": "2020-08-21T14:51:39.989Z"
+        }
+    }
+]

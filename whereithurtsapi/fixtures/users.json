@@ -7,7 +7,7 @@
         "last_login": null,
         "is_superuser": false,
         "username": "test",
-        "first_name": "tes",            
+        "first_name": "test",            
         "last_name": "test",
         "email": "test@test.test",
         "is_staff": false,

@@ -1,0 +1,50 @@
+[
+    {
+        "model": "whereithurtsapi.treatment",
+        "pk": 1,
+        "fields": {
+            "added_by": 1,
+            "name": "foot love",
+            "added_on": "2020-08-13T14:18:10.909Z",
+            "bodypart": 2,
+            "treatmenttype": 4,
+            "notes": "Use thumbs / concentrated weight to massage / apply pressure to affected areas"
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatment",
+        "pk": 2,
+        "fields": {
+            "added_by": 1,
+            "name": "single-leg deadlifts",
+            "added_on": "2020-08-15T12:18:45.909Z",
+            "bodypart": 5,
+            "treatmenttype": 2,
+            "notes": "weights optional; try to keep a straight back while crouching down slowly and holding"
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatment",
+        "pk": 3,
+        "fields": {
+            "added_by": 1,
+            "name": "banded ankle dorsiflection",
+            "added_on": "2020-08-15T10:09:10.809Z",
+            "bodypart": 2,
+            "treatmenttype": 3,
+            "notes": "Still need to pick up a resistence band for this"
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatment",
+        "pk": 4,
+        "fields": {
+            "added_by": 1,
+            "name": "normatech",
+            "added_on": "2020-08-17T14:18:10.909Z",
+            "bodypart": 1,
+            "treatmenttype": 1,
+            "notes": "get in the tubeeee"
+        }
+    }
+]

@@ -1,0 +1,24 @@
+[
+    {
+        "model": "whereithurtsapi.hurt",
+        "pk": 1,
+        "fields": {
+            "patient": 1,
+            "name": "Right-foot tendonitis",
+            "added_on": "2020-08-12T14:20:19.989Z",
+            "bodypart": 2,
+            "is_active": true
+        }
+    },
+    {
+        "model": "whereithurtsapi.hurt",
+        "pk": 2,
+        "fields": {
+            "patient": 1,
+            "name": "Right leg IT band strain",
+            "added_on": "2020-08-16T14:20:19.989Z",
+            "bodypart": 5,
+            "is_active": true
+        }
+    }
+]
