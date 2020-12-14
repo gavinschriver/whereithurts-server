@@ -51,7 +51,7 @@ def register_user(request):
         req_body = json.loads(request.body.decode())
 
         # Verify all required values are present
-        required_fields = [ 'username', 'email', 'password', 'first_name', 'last_name', 'bio' ]
+        required_fields = [ 'username', 'email', 'password', 'firstname', 'lastname' ]
         for field in required_fields:
             if not field in req_body:
                 return HttpResponseBadRequest(json.dumps({ "message": f"Field `{field}` is required." }))
@@ -61,8 +61,8 @@ def register_user(request):
             username=req_body['username'],
             email=req_body['email'],
             password=req_body['password'],
-            first_name=req_body['first_name'],
-            last_name=req_body['last_name']
+            first_name=req_body['firstname'],
+            last_name=req_body['lastname']
         )
 
         # Create a new Rater to pair with this User
@@ -75,5 +75,5 @@ def register_user(request):
         token = Token.objects.create(user=new_user)
 
         # Return the token to the client
-        data = json.dumps({ "token": token.key })
+        data = json.dumps({ "patient_token": token.key })
         return HttpResponse(data, content_type="application/json")
