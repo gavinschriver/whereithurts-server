@@ -1,0 +1,72 @@
+[
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 1,
+        "fields": {
+           "name": "Many/All"
+        }
+    },
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 2,
+        "fields": {
+           "name": "Foot"
+        }
+    },
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 3,
+        "fields": {
+           "name": "Ankle/Lower Leg"
+        }
+    },
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 4,
+        "fields": {
+           "name": "Knee"
+        }
+    },
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 5,
+        "fields": {
+           "name": "Thigh/Hip/Groin/Pelvis"
+        }
+    },
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 6,
+        "fields": {
+           "name": "Spine/Lower Back"
+        }
+    },
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 7,
+        "fields": {
+           "name": "Core/Chest"
+        }
+    },
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 8,
+        "fields": {
+           "name": "Shoulder/Neck/Upper Arm"
+        }
+    },
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 9,
+        "fields": {
+           "name": "Elbow"
+        }
+    },
+    {
+        "model": "whereithurtsapi.bodypart",
+        "pk": 10,
+        "fields": {
+           "name": "Forearm/Wrist/Hand"
+        }
+    }
+]

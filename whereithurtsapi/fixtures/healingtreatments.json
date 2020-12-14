@@ -1,0 +1,34 @@
+[
+    {
+        "model": "whereithurtsapi.healingtreatment",
+        "pk": 1,
+        "fields": {
+            "healing": 1,
+            "treatment": 1
+      }
+    },
+    {
+        "model": "whereithurtsapi.healingtreatment",
+        "pk": 2,
+        "fields": {
+            "healing": 1,
+            "treatment": 3
+      }
+    },
+    {
+        "model": "whereithurtsapi.healingtreatment",
+        "pk": 3,
+        "fields": {
+            "healing": 2,
+            "treatment": 1
+      }
+    },
+    {
+        "model": "whereithurtsapi.healingtreatment",
+        "pk": 4,
+        "fields": {
+            "healing": 2,
+            "treatment": 2
+      }
+    }
+    ]

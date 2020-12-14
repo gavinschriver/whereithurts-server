@@ -1,0 +1,39 @@
+
+[
+    {
+        "model": "whereithurtsapi.treatmentlink",
+        "pk": 1,
+        "fields": {
+           "treatment": 2,
+           "linktext": "Scott youtube vid SLDL",
+           "linkurl": "https://www.youtube.com/watch?v=fLZspSYCnNY"
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatmentlink",
+        "pk": 2,
+        "fields": {
+           "treatment": 1,
+           "linktext": "foot love scott youtube vid",
+           "linkurl": "https://www.youtube.com/watch?v=sthK-3mCBbM"
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatmentlink",
+        "pk": 3,
+        "fields": {
+           "treatment": 4,
+           "linktext": "Normatech website",
+           "linkurl": "https://normatec.hyperice.com/"
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatmentlink",
+        "pk": 4,
+        "fields": {
+           "treatment": 3,
+           "linktext": "banded ankle video",
+           "linkurl": "https://www.youtube.com/watch?v=Ahg1Amvif4A"
+        }
+    }
+]
