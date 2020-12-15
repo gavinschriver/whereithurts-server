@@ -12,6 +12,7 @@ class Healing(models.Model):
 
     @property
     def treatments(self):
-        healing_treatments = self.HealingTreatments.all()
+        healing_treatments = self.healing_treatments.all()
         return [ht.treatment for ht in healing_treatments]
+    
         
