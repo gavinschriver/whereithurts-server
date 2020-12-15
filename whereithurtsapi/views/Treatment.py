@@ -10,7 +10,7 @@ class TreatmentSerializer(ModelSerializer):
     """JSON serializer for the Treatment model """
     class Meta:
         model = Treatment
-        fields = ('id','name', 'bodypart', 'treatmenttype', 'added_by', 'notes')
+        fields = ('id','name', 'bodypart', 'treatmenttype', 'added_by', 'notes', 'public')
         depth = 1
 
 #Viewset

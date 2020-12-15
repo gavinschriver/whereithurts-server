@@ -10,3 +10,4 @@ class Treatment(models.Model):
     name = models.CharField(max_length=75)
     added_on = models.DateTimeField()
     notes = models.CharField(max_length=400)
+    public = models.BooleanField(default=False)
