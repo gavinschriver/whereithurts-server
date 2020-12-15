@@ -1,5 +1,3 @@
-from django.contrib.auth.models import User
-import rest_framework
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -12,7 +10,7 @@ class PatientSerializer(ModelSerializer):
     """JSON serializer for the Patient model """
     class Meta:
         model = Patient
-        fields = ('full_name', 'first_name', 'last_name', 'username', 'email')
+        fields = ('id', 'full_name', 'first_name', 'last_name', 'username', 'email')
 
 #Viewset
 class PatientViewSet(ViewSet):
