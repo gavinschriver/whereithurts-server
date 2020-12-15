@@ -10,7 +10,7 @@ class HurtSerializer(ModelSerializer):
     """JSON serializer for the Hurt model"""
     class Meta:
         model = Hurt
-        fields = ('patient', 'bodypart', 'name', 'added_on', 'is_active')
+        fields = ('id','patient', 'bodypart', 'name', 'added_on', 'is_active')
         depth = 1
 
 #Viewset 
