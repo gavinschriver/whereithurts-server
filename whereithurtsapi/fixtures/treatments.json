@@ -46,17 +46,5 @@
             "treatmenttype": 1,
             "notes": "get in the tubeeee"
         }
-    },
-    {
-        "model": "whereithurtsapi.treatment",
-        "pk": 5,
-        "fields": {
-            "added_by": 2,
-            "name": "couch stretch",
-            "added_on": "2020-10-17T14:18:10.909Z",
-            "bodypart": 1,
-            "treatmenttype": 1,
-            "notes": "optionally add twist (just like a cocktail amirite?"
-        }
     }
 ]

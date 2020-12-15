@@ -2,15 +2,23 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from whereithurtsapi.models import Treatment
+from whereithurtsapi.models import Treatment, TreatmentLink
 
 
 # Serializers 
+
+class TreatmentLinkSerializer(ModelSerializer):
+    """JSON Serializer for TreatmentLink model"""
+    class Meta:
+        model = TreatmentLink
+        fields = ('id', 'linktext', 'linkurl')
+
 class TreatmentSerializer(ModelSerializer):
     """JSON serializer for the Treatment model """
+    links = TreatmentLinkSerializer(many=True)
     class Meta:
         model = Treatment
-        fields = ('id','name', 'bodypart', 'treatmenttype', 'added_by', 'notes', 'public')
+        fields = ('id','name', 'bodypart', 'treatmenttype', 'added_by', 'notes', 'public', 'links')
         depth = 1
 
 #Viewset
