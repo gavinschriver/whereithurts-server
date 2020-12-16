@@ -7,6 +7,7 @@ from whereithurtsapi.models import Healing, Patient, Treatment, HealingTreatment
 from whereithurtsapi.views.Treatment import TreatmentSerializer
 from whereithurtsapi.views.Hurt import HurtSerializer
 from django.utils import timezone
+from django.db.models import Sum
 
 # Serializers
 
@@ -150,12 +151,16 @@ class HealingViewSet(ViewSet):
         # e.g. /healings?patient_id=1
         patient_id = self.request.query_params.get('patient_id', None)
         if patient_id is not None:
-            healings = healings.filter(added_by_id=patient_id)
+            healings = healings.filter(patient_id=patient_id)
 
         healinglist = HealingSerializer(
             healings, many=True, context={'request': request})
+
+        totalHealingTime = healings.aggregate(Sum('duration'))
+        
         healingData = {}
         healingData["healings"] = healinglist.data
+        healingData["total_healing_time"] = totalHealingTime["duration__sum"]
         return Response(healingData)
 
     def retrieve(self, request, pk=None):
