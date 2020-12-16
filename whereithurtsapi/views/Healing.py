@@ -119,7 +119,8 @@ class HealingViewSet(ViewSet):
             return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
 
         # prune treatments and hurts that were previously associated with this healing if their id is no longer in the array of treatment_ids or hurt_ids
-        current_healing_treatments = HealingTreatment.objects.filter(healing=healing)
+        current_healing_treatments = HealingTreatment.objects.filter(
+            healing=healing)
         current_healing_treatments.exclude(treatment__in=treatments).delete()
 
         current_hurt_healings = HurtHealing.objects.filter(healing=healing)
@@ -130,7 +131,8 @@ class HealingViewSet(ViewSet):
             try:
                 current_healing_treatments.get(treatment=treatment)
             except HealingTreatment.DoesNotExist:
-                new_healing_treatment = HealingTreatment(healing=healing, treatment=treatment)
+                new_healing_treatment = HealingTreatment(
+                    healing=healing, treatment=treatment)
                 new_healing_treatment.save()
 
         for hurt in hurts:
@@ -140,9 +142,7 @@ class HealingViewSet(ViewSet):
                 new_hurt_healing = HurtHealing(hurt=hurt, healing=healing)
                 new_hurt_healing.save()
 
-
         return Response({}, status=status.HTTP_204_NO_CONTENT)
-
 
     def list(self, request):
         """ Access a list of some/all Healings """
@@ -157,7 +157,7 @@ class HealingViewSet(ViewSet):
             healings, many=True, context={'request': request})
 
         totalHealingTime = healings.aggregate(Sum('duration'))
-        
+
         healingData = {}
         healingData["healings"] = healinglist.data
         healingData["total_healing_time"] = totalHealingTime["duration__sum"]
@@ -172,3 +172,12 @@ class HealingViewSet(ViewSet):
             return Response(serializer.data)
         except Healing.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+
+    def destroy(self, request, pk=None):
+        """ Delete a single Healing """
+        try:
+            healing = Healing.objects.get(pk=pk)
+        except Healing.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+        healing.delete()
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
