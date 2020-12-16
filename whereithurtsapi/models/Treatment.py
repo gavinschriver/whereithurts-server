@@ -11,3 +11,8 @@ class Treatment(models.Model):
     added_on = models.DateTimeField()
     notes = models.CharField(max_length=400)
     public = models.BooleanField(default=False)
+
+    @property
+    def links(self):
+        return self.treatmentlink_set.all()
+

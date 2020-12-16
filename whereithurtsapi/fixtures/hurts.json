@@ -20,16 +20,5 @@
             "bodypart": 5,
             "is_active": true
         }
-    },
-    {
-        "model": "whereithurtsapi.hurt",
-        "pk": 3,
-        "fields": {
-            "patient": 2,
-            "name": "right groin",
-            "added_on": "2020-07-19T14:13:19.909Z",
-            "bodypart": 5,
-            "is_active": true
-        }
     }
 ]

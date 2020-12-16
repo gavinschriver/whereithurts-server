@@ -1,6 +1,5 @@
 """Database Healing module"""
 from django.db import models
-from whereithurtsapi.models import Treatment
 
 class Healing(models.Model):
     """Database Healing model"""
@@ -15,4 +14,7 @@ class Healing(models.Model):
         healing_treatments = self.healing_treatments.all()
         return [ht.treatment for ht in healing_treatments]
     
-        
+    @property
+    def hurts(self):
+        hurt_healings = self.hurt_healings.all()
+        return [hh.hurt for hh in hurt_healings]    

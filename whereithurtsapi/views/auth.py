@@ -75,5 +75,5 @@ def register_user(request):
         token = Token.objects.create(user=new_user)
 
         # Return the token to the client
-        data = json.dumps({ "patient_token": token.key })
+        data = json.dumps({"valid": True, "token": token.key, "patient_id": patient.id})
         return HttpResponse(data, content_type="application/json")
