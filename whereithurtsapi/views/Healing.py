@@ -19,7 +19,7 @@ class HealingSerializer(ModelSerializer):
     class Meta:
         model = Healing
         fields = ('id', 'patient', 'notes', 'duration',
-                  'added_on', 'treatments', 'hurts')
+                  'added_on', 'treatments', 'hurts', 'date_added')
         depth = 1
 
 # Viewset
