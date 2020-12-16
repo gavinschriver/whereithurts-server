@@ -17,4 +17,8 @@ class Healing(models.Model):
     @property
     def hurts(self):
         hurt_healings = self.hurt_healings.all()
-        return [hh.hurt for hh in hurt_healings]    
+        return [hh.hurt for hh in hurt_healings]
+
+    @property
+    def date_added(self):
+        return self.added_on.strftime('%-m/%d/%Y')
