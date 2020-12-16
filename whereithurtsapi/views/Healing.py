@@ -152,9 +152,11 @@ class HealingViewSet(ViewSet):
         if patient_id is not None:
             healings = healings.filter(added_by_id=patient_id)
 
-        serializer = HealingSerializer(
+        healinglist = HealingSerializer(
             healings, many=True, context={'request': request})
-        return Response(serializer.data)
+        healingData = {}
+        healingData["healings"] = healinglist.data
+        return Response(healingData)
 
     def retrieve(self, request, pk=None):
         """ Access a single Healing """
