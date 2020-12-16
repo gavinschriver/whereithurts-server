@@ -135,7 +135,7 @@ class HealingViewSet(ViewSet):
         for hurt in hurts:
             try:
                 current_hurt_healings.get(hurt=hurt)
-            except HealingTreatment.DoesNotExist:
+            except HurtHealing.DoesNotExist:
                 new_hurt_healing = HurtHealing(hurt=hurt, healing=healing)
                 new_hurt_healing.save()
 
