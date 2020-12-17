@@ -1,3 +1,4 @@
+from whereithurtsapi.views.Hurt import HurtSerializer
 from django.core.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ViewSet
@@ -16,10 +17,11 @@ class TreatmentLinkSerializer(ModelSerializer):
 
 class TreatmentSerializer(ModelSerializer):
     """JSON serializer for the Treatment model """
+    hurts = HurtSerializer(many=True)
     links = TreatmentLinkSerializer(many=True)
     class Meta:
         model = Treatment
-        fields = ('id','name', 'bodypart', 'treatmenttype', 'added_by', 'notes', 'public', 'links')
+        fields = ('id','name', 'bodypart', 'treatmenttype', 'added_by', 'notes', 'public', 'links', 'hurts')
         depth = 1
 
 #Viewset
