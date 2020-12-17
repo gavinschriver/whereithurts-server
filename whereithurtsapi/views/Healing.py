@@ -83,7 +83,7 @@ class HealingViewSet(ViewSet):
         return Response(serialzier.data)
 
     def update(self, request, pk=None):
-        """ Handle an update request for an update
+        """ Handle an update request for a Healing
         'user', and 'added_on' attributes are not subject to update
 
         """
@@ -112,7 +112,7 @@ class HealingViewSet(ViewSet):
         except Treatment.DoesNotExist:
             return Response({'message': 'request contains a treatment id for a non-existent treatment'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        # Try to save the new Healing to the database
+        # Try to save the updated Healing to the database
         try:
             healing.save()
         except ValidationError as ex:

@@ -16,3 +16,9 @@ class Treatment(models.Model):
     def links(self):
         return self.treatmentlink_set.all()
 
+    @property
+    def hurts(self):
+        hurt_treatments = self.hurt_treatments.all()
+        return [ht.hurt for ht in hurt_treatments]
+
+
