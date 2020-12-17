@@ -1,9 +1,10 @@
+from django.core.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from whereithurtsapi.models import Treatment, TreatmentLink
-
+from whereithurtsapi.models import Treatment, TreatmentType, Bodypart, TreatmentLink, Patient, Hurt, HurtTreatment
+from django.utils import timezone
 
 # Serializers 
 
@@ -22,8 +23,63 @@ class TreatmentSerializer(ModelSerializer):
         depth = 1
 
 #Viewset
+
 class TreatmentViewSet(ViewSet):
     """ViewSet for the Treatment model """
+    def create(self, request):
+        """ Handle  POST operations to /treatments
+        
+        Return:
+            Response --JSON Serialized Treatment instance
+        """
+        # find patient making this POST request and assign them as the patient for a new healing
+        patient = Patient.objects.get(user=request.auth.user)
+
+        treatment = Treatment()
+        treatment.added_by = patient
+
+        treatment.name = request.data["name"]
+        treatment.notes = request.data["notes"]
+        treatment.added_on = timezone.now()
+
+        treatment.treatmenttype = TreatmentType.objects.get(pk=request.data["treatmenttype_id"])
+        treatment.bodypart = Bodypart.objects.get(pk=request.data["bodypart_id"])
+
+        # extract hurt ids from request and try to convert that collection to a queryset of Hurt instances
+        hurt_ids = request.data["hurt_ids"]
+
+        try:
+            hurts = [Hurt.objects.get(pk=hurt_id) for hurt_id in hurt_ids]
+        except Hurt.DoesNotExist:
+            return Response({'message': 'request contains a hurt id for a non-existent hurt'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        
+        # Try to save the new Treatment to the database
+        try:
+            treatment.save()
+        except ValidationError as ex:
+            return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
+
+        # save bridge table relationships)
+
+        for hurt in hurts:
+            hurt_treatment = HurtTreatment(hurt=hurt, treatment=treatment)
+            hurt_treatment.save()
+
+        #save links, maybe?
+        treatment_links = request.data["treatment_links"]
+
+        for treatment_link in treatment_links:
+            new_treatment_link = TreatmentLink()
+            new_treatment_link.linktext = treatment_link["linktext"]
+            new_treatment_link.linkurl = treatment_link["linkurl"]
+            new_treatment_link.treatment = treatment
+            new_treatment_link.save()
+        
+        serializer = TreatmentSerializer(treatment, context={'request': request})
+        return Response(serializer.data)
+
+
+
 
     def list(self, request):
         """ Access a list of some/all Treatments """
