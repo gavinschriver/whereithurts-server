@@ -9,4 +9,15 @@ class Hurt(models.Model):
     name = models.CharField(max_length=100)
     added_on = models.DateTimeField()
     is_active = models.BooleanField()
+
+    @property
+    def notes(self):
+        first_update = self.update_set.get(added_on=self.added_on)
+        return first_update.notes
+
+    @property
+    def pain_level(self):
+        first_update = self.update_set.get(added_on=self.added_on)
+        return first_update.pain_level
+
     
