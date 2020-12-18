@@ -31,7 +31,7 @@ class HurtViewSet(ViewSet):
         return Response(serializer.data)
 
 
-    def create(self, request, pk=None):
+    def create(self, request):
         """ Handle POST operations to /hurts
 
         Also creates an Update instance that is the first
@@ -46,6 +46,7 @@ class HurtViewSet(ViewSet):
         hurt = Hurt()
         hurt.patient = patient
         hurt.name = request.data["name"]
+        hurt.is_active = request.data["is_active"]
         hurt.added_on = timezone.now()
 
         hurt.bodypart = Bodypart.objects.get(pk=request.data["bodypart_id"])
@@ -78,6 +79,8 @@ class HurtViewSet(ViewSet):
         update.notes = request.data["notes"]
         update.save()
 
+        serializer = HurtSerializer(hurt, context={'request': request})
+        return Response(serializer.data)
 
 
 

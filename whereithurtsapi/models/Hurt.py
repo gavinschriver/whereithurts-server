@@ -12,12 +12,12 @@ class Hurt(models.Model):
 
     @property
     def notes(self):
-        first_update = self.update_set.get(added_on=self.added_on)
-        return first_update.notes
+        first_update = self.update_set.order_by('added_on')[0]
+        return f"{first_update.notes}"
 
     @property
     def pain_level(self):
-        first_update = self.update_set.get(added_on=self.added_on)
+        first_update = self.update_set.order_by('added_on')[0]
         return first_update.pain_level
 
     
