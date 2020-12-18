@@ -88,6 +88,9 @@ class TreatmentViewSet(ViewSet):
         'user' and "added_on"  attributes are not subject to update
 
         'public' attribute is not currently implemented in client features
+
+        This method deletes all existing links from the DB for this treatment, then recreates them
+        based on link object collection in the request body
         """
         treatment = Treatment.objects.get(pk=pk)
 
@@ -142,8 +145,6 @@ class TreatmentViewSet(ViewSet):
         return Response(serializer.data)
 
 
-
-
     def list(self, request):
         """ Access a list of some/all Treatments """
         treatments = Treatment.objects.all()
@@ -166,6 +167,14 @@ class TreatmentViewSet(ViewSet):
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
 
+    def destroy(self, request, pk=None):
+        """ Delete a single Treatment """
+        try: 
+            treatment = Treatment.objects.get(pk=pk)
+        except Treatment.DoesNotExist as ex:
+            return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
+        treatment.delete()
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
 
