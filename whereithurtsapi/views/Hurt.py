@@ -145,7 +145,7 @@ class HurtViewSet(ViewSet):
 
         # prune treatments that were previously associated if their id is no longer in the treatment_ids
         current_hurt_treatments = HurtTreatment.objects.filter(hurt=hurt)
-        current_hurt_treatments.exclude(treatment__in=treatments).delete
+        current_hurt_treatments.exclude(treatment__in=treatments).delete()
 
         # for the treatments that were still in (or are now added to) that array of ids, see if the relationship exists already; if not, create it 
         for treatment in treatments:
