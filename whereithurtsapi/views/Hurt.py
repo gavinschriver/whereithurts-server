@@ -9,6 +9,11 @@ from django.utils import timezone
 
 #Serializers
 
+class UpdateSerializer(ModelSerializer):
+    class Meta:
+        model = Update
+        fields = ('id', 'added_on')
+
 class TreatmentLinkSerializer(ModelSerializer):
     class Meta:
         model = TreatmentLink
@@ -24,9 +29,10 @@ class TreatmentSerializer(ModelSerializer):
 class HurtSerializer(ModelSerializer):
     """JSON serializer for the Hurt model"""
     treatments = TreatmentSerializer(many=True)
+    updates = UpdateSerializer(many=True)
     class Meta:
         model = Hurt
-        fields = ('id','patient', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level', 'healing_count', 'treatments')
+        fields = ('id','patient', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level', 'healing_count', 'treatments', 'updates')
         depth = 1
 
 #Viewset 
