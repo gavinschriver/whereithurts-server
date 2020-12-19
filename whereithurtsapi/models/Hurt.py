@@ -9,4 +9,40 @@ class Hurt(models.Model):
     name = models.CharField(max_length=100)
     added_on = models.DateTimeField()
     is_active = models.BooleanField()
+
+    @property
+    def notes(self):
+        first_update = self.update_set.order_by('added_on')[0]
+        return f"{first_update.notes}"
+
+    @property
+    def pain_level(self):
+        first_update = self.update_set.order_by('added_on')[0]
+        return first_update.pain_level
+
+    @property
+    def healing_count(self):
+        return self.hurt_healings.all().count()
+
+    @property
+    def treatments(self):
+        hurt_treatments = self.hurt_treatments.all()
+        return [ht.treatment for ht in hurt_treatments]
     
+    @property
+    def updates(self):
+        return self.update_set.all().order_by('added_on')
+
+    @property
+    def last_update(self):
+        last_update = self.update_set.all().order_by('-added_on')[0]
+        return last_update.added_on.strftime('%-m/%d/%Y')
+    
+    @property
+    def first_update_id(self):
+        return self.update_set.all().order_by('added_on')[0].id
+
+    @property
+    def date_added(self):
+        return self.added_on.strftime('%-m/%d/%Y')
+

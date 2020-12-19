@@ -120,7 +120,7 @@ class TreatmentViewSet(ViewSet):
         current_hurt_treatments = HurtTreatment.objects.filter(treatment=treatment) 
         current_hurt_treatments.exclude(hurt__in=hurts).delete()
 
-        # for the hurts that were still in (or are now added to) that arrays of ids, see if the relationship exists already; if not, create it
+        # for the hurts that were still in (or are now added to) that array of ids, see if the relationship exists already; if not, create it
         for hurt in hurts:
             try:
                 current_hurt_treatments.get(hurt=hurt)
