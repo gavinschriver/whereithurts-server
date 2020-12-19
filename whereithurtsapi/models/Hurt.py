@@ -31,4 +31,18 @@ class Hurt(models.Model):
     
     @property
     def updates(self):
-        return self.update_set.all()
+        return self.update_set.all().order_by('added_on')
+
+    @property
+    def last_update(self):
+        last_update = self.update_set.all().order_by('-added_on')[0]
+        return last_update.added_on.strftime('%-m/%d/%Y')
+    
+    @property
+    def first_update_id(self):
+        return self.update_set.all().order_by('added_on')[0].id
+
+    @property
+    def date_added(self):
+        return self.added_on.strftime('%-m/%d/%Y')
+
