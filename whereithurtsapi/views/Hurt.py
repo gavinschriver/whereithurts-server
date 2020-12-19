@@ -4,19 +4,43 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from whereithurtsapi.models import Hurt, Patient, Update, HurtTreatment, Treatment, Bodypart
+from whereithurtsapi.models import Hurt, Patient, Update, HurtTreatment, Treatment, TreatmentLink, Bodypart
 from django.utils import timezone
 
 #Serializers
+
+class TreatmentLinkSerializer(ModelSerializer):
+    class Meta:
+        model = TreatmentLink
+        fields = ('id', 'linktext', 'linkurl')
+
+class TreatmentSerializer(ModelSerializer):
+    links = TreatmentLinkSerializer(many=True)
+    """ JSON serializer for Treatments to embed on Hurts """
+    class Meta:
+        model = Treatment
+        fields = ('id', 'name', 'added_on', 'added_by', 'notes', 'public', 'links')
+
 class HurtSerializer(ModelSerializer):
     """JSON serializer for the Hurt model"""
+    treatments = TreatmentSerializer(many=True)
     class Meta:
         model = Hurt
-        fields = ('id','patient', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level')
+        fields = ('id','patient', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level', 'healing_count', 'treatments')
         depth = 1
 
 #Viewset 
 class HurtViewSet(ViewSet):
+    def retrieve(self, request, pk=None):
+        """ Access a single Hurt """
+        try:
+            hurt = Hurt.objects.get(pk=pk)
+        except Hurt.DoesNotExist:
+            return Response({'message': 'hurt does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = HurtSerializer(hurt, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
     def list(self, request):
         """Access a list of some/all Hurts"""
 

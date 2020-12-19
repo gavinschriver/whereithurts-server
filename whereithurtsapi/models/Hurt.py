@@ -20,4 +20,11 @@ class Hurt(models.Model):
         first_update = self.update_set.order_by('added_on')[0]
         return first_update.pain_level
 
-    
+    @property
+    def healing_count(self):
+        return self.hurt_healings.all().count()
+
+    @property
+    def treatments(self):
+        hurt_treatments = self.hurt_treatments.all()
+        return [ht.treatment for ht in hurt_treatments]
