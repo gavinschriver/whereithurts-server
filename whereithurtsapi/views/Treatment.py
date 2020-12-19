@@ -23,7 +23,7 @@ class TreatmentSerializer(ModelSerializer):
     links = TreatmentLinkSerializer(many=True)
     class Meta:
         model = Treatment
-        fields = ('id','name', 'bodypart', 'treatmenttype', 'added_by', 'notes', 'public', 'links', 'hurts')
+        fields = ('id','name', 'bodypart', 'treatmenttype', 'added_by', 'notes', 'public', 'links', 'hurts', 'owner')
         depth = 1
 
 #Viewset
@@ -48,6 +48,7 @@ class TreatmentViewSet(ViewSet):
 
         treatment.treatmenttype = TreatmentType.objects.get(pk=request.data["treatmenttype_id"])
         treatment.bodypart = Bodypart.objects.get(pk=request.data["bodypart_id"])
+
 
         # extract hurt ids from request and try to convert that collection to a queryset of Hurt instances
         hurt_ids = request.data["hurt_ids"]
@@ -153,6 +154,11 @@ class TreatmentViewSet(ViewSet):
         patient_id = self.request.query_params.get('patient_id', None)
         if patient_id is not None:
             treatments = treatments.filter(added_by_id=patient_id)
+        
+        for treatment in treatments:
+            treatment.owner = False
+            if treatment.added_by == Patient.objects.get(user=request.auth.user):
+                treatment.owner = True
 
         serializer = TreatmentSerializer(treatments, many=True, context={'request': request})
         return Response(serializer.data)
@@ -161,6 +167,9 @@ class TreatmentViewSet(ViewSet):
         """ Access a single Treatment """
         try:
             treatment = Treatment.objects.get(pk=pk)
+            treatment.owner = False
+            if treatment.added_by == Patient.objects.get(user=request.auth.user):
+                treatment.owner = True
             serializer = TreatmentSerializer(treatment, context={'request': request})
             return Response(serializer.data)
         except Treatment.DoesNotExist as ex:

@@ -32,7 +32,7 @@ class HurtSerializer(ModelSerializer):
     updates = UpdateSerializer(many=True)
     class Meta:
         model = Hurt
-        fields = ('id','patient', 'date_added', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level', 'healing_count', 'treatments', 'updates', 'last_update', 'first_update_id')
+        fields = ('id','patient', 'date_added', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level', 'healing_count', 'treatments', 'updates', 'last_update', 'first_update_id', 'owner')
         depth = 1
 
 #Viewset 
@@ -43,6 +43,12 @@ class HurtViewSet(ViewSet):
             hurt = Hurt.objects.get(pk=pk)
         except Hurt.DoesNotExist:
             return Response({'message': 'hurt does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        
+        hurt.owner = False
+
+        if hurt.patient == Patient.objects.get(user=request.auth.user):
+            hurt.owner = True
+
         serializer = HurtSerializer(hurt, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -56,6 +62,12 @@ class HurtViewSet(ViewSet):
         patient_id = self.request.query_params.get('patient_id', None)
         if patient_id is not None:
             hurts = hurts.filter(patient_id=patient_id)
+
+        for hurt in hurts:
+            hurt.owner = False
+
+            if hurt.patient == Patient.objects.get(user=request.auth.user):
+                hurt.owner = True
         
         serializer = HurtSerializer(hurts, many=True, context={'request': request})
         return Response(serializer.data)
