@@ -12,7 +12,7 @@ from django.utils import timezone
 class UpdateSerializer(ModelSerializer):
     class Meta:
         model = Update
-        fields = ('id', 'added_on', 'notes', 'pain_level', 'hurt')
+        fields = ('id', 'added_on', 'notes', 'pain_level', 'hurt', 'is_first_update')
         depth = 1
 
 #Viewset

@@ -8,3 +8,8 @@ class Update(models.Model):
     pain_level = models.IntegerField()
     notes = models.CharField(max_length=300)
 
+    @property
+    def is_first_update(self):
+        if self.hurt.first_update_id == self.id:
+            return True
+        return False
