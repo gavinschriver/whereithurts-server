@@ -6,3 +6,4 @@ from .Healing import HealingViewSet
 from .TreatmentType import TreatmentTypeViewSet
 from .Bodypart import BodypartViewSet
 from .Update import UpdateViewSet
+from .Profile import ProfileViewSet
