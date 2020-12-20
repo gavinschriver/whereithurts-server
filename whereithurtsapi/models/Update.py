@@ -8,8 +8,16 @@ class Update(models.Model):
     pain_level = models.IntegerField()
     notes = models.CharField(max_length=300)
 
+    """ property to establish if this Update is the first one for a Hurt, 
+        which dictates whether or not it is editable as a standalone Update
+    """
     @property
     def is_first_update(self):
         if self.hurt.first_update_id == self.id:
             return True
         return False
+
+    @property
+    def date_added(self):
+        return self.added_on.strftime('%-m/%d/%Y')
+
