@@ -179,8 +179,20 @@ class HurtViewSet(ViewSet):
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
+    def destroy(self, request, pk=None):
+        
+        req_patient = Patient.objects.get(user=request.auth.user)
 
+        try:
+            hurt = Hurt.objects.get(pk=pk)
+        except Hurt.DoesNotExist:
+            return Response({'message': 'Hurt does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
+        if not req_patient.id == hurt.patient.id:
+            return Response({'message': 'not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
 
+        hurt.delete()
+
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 

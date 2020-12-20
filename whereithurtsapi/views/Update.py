@@ -71,7 +71,10 @@ class UpdateViewSet(ViewSet):
         
         req_patient = Patient.objects.get(user=request.auth.user)
 
-        update = Update.objects.get(pk=pk)
+        try:
+            update = Update.objects.get(pk=pk)
+        except Update.DoesNotExist:
+            return Response({'message': 'Update does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
         if not req_patient.id == update.hurt.patient.id:
             return Response({'message': 'not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -83,6 +86,22 @@ class UpdateViewSet(ViewSet):
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
+    def destroy(self, request, pk=None):
+        
+        req_patient = Patient.objects.get(user=request.auth.user)
+
+        try:
+            update = Update.objects.get(pk=pk)
+        except Update.DoesNotExist:
+            return Response({'message': 'Update does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+        if not req_patient.id == update.hurt.patient.id:
+            return Response({'message': 'not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        update.delete()
+        
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        
 
         
 
