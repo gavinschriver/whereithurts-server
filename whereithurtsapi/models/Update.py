@@ -21,3 +21,16 @@ class Update(models.Model):
     def date_added(self):
         return self.added_on.strftime('%-m/%d/%Y')
 
+    @property
+    def pain_level_difference(self):
+        try:
+            previous = self.get_previous_by_added_on(hurt=self.hurt)
+            if previous.pain_level > self.pain_level:
+                return f"Down {previous.pain_level - self.pain_level} from last update"
+            elif previous.pain_level < self.pain_level:
+                return f"Up {self.pain_level - previous.pain_level} from last update"
+            else:
+                return "No change from last update"
+        except:
+            pass
+

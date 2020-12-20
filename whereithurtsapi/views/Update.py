@@ -1,3 +1,4 @@
+from rest_framework import response
 from whereithurtsapi.models.Patient import Patient
 from django.core.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer
@@ -12,7 +13,7 @@ from django.utils import timezone
 class UpdateSerializer(ModelSerializer):
     class Meta:
         model = Update
-        fields = ('id', 'added_on', 'notes', 'pain_level', 'hurt', 'is_first_update', 'date_added')
+        fields = ('id', 'added_on', 'notes', 'pain_level', 'hurt', 'is_first_update', 'date_added', 'pain_level_difference')
         depth = 1
 
 #Viewset
@@ -65,6 +66,24 @@ class UpdateViewSet(ViewSet):
 
         serializer = UpdateSerializer(update, context={'request': request})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, pk=None):
+        
+        req_patient = Patient.objects.get(user=request.auth.user)
+
+        update = Update.objects.get(pk=pk)
+
+        if not req_patient.id == update.hurt.patient.id:
+            return Response({'message': 'not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        update.notes = request.data["notes"]
+        update.pain_level = request.data["pain_level"]
+
+        update.save()
+
+        return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+
         
 
         
