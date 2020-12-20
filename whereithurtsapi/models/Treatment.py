@@ -21,4 +21,11 @@ class Treatment(models.Model):
         hurt_treatments = self.hurt_treatments.all()
         return [ht.hurt for ht in hurt_treatments]
 
+    @property
+    def owner(self):
+        return self._owner
+    
+    @owner.setter
+    def owner(self, new_value):
+        self._owner = new_value
 

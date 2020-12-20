@@ -46,3 +46,12 @@ class Hurt(models.Model):
     def date_added(self):
         return self.added_on.strftime('%-m/%d/%Y')
 
+    @property
+    def owner(self):
+        return self._owner
+    
+    @owner.setter
+    def owner(self, new_value):
+        self._owner = new_value
+    
+
