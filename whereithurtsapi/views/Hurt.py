@@ -4,7 +4,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from whereithurtsapi.models import Hurt, Patient, Update, HurtTreatment, Treatment, TreatmentLink, Bodypart
+from whereithurtsapi.models import Hurt, Patient, Update, HurtTreatment, Treatment, TreatmentLink, Bodypart, Healing
 from django.utils import timezone
 
 #Serializers
@@ -19,6 +19,11 @@ class TreatmentLinkSerializer(ModelSerializer):
         model = TreatmentLink
         fields = ('id', 'linktext', 'linkurl')
 
+class HealingSerializer(ModelSerializer):
+    class Meta:
+        model = Healing
+        fields = ('id', 'date_added')
+
 class TreatmentSerializer(ModelSerializer):
     links = TreatmentLinkSerializer(many=True)
     """ JSON serializer for Treatments to embed on Hurts """
@@ -28,11 +33,12 @@ class TreatmentSerializer(ModelSerializer):
 
 class HurtSerializer(ModelSerializer):
     """JSON serializer for the Hurt model"""
+    healings = HealingSerializer(many=True)
     treatments = TreatmentSerializer(many=True)
     updates = UpdateSerializer(many=True)
     class Meta:
         model = Hurt
-        fields = ('id','patient', 'date_added', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level', 'healing_count', 'treatments', 'updates', 'last_update', 'first_update_id', 'owner')
+        fields = ('id','patient', 'healings', 'date_added', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level', 'healing_count', 'treatments', 'updates', 'last_update', 'first_update_id', 'owner')
         depth = 1
 
 #Viewset 
