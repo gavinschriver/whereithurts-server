@@ -79,12 +79,13 @@ class HurtViewSet(ViewSet):
         #combine the two lists into one called history
         history = healings_list + updates_list
 
-        # check to see if "reverse" is in query params to sort by date desc
-        reversed = self.request.query_params.get("reverse", None)
+        # history is returned with newest first by default; check for q string to see if this is flipped with "oldest"
+        order = self.request.query_params.get("order_history", None)
 
-        reverse = False
-        if reversed is not None:
-            reverse = True
+        reverse = True
+        if order is not None:
+            if order == "oldest":
+                reverse = False
 
         # sorting function to compare by datetime value of "added_on"
         by_date = lambda row : row["added_on"]
