@@ -7,13 +7,14 @@ from rest_framework import status
 from whereithurtsapi.models import Hurt, Patient, Update, HurtTreatment, Treatment, TreatmentLink, Bodypart, Healing
 from django.utils import timezone
 from itertools import chain
+from operator import attrgetter
 
 #Serializers
 
 class UpdateSerializer(ModelSerializer):
     class Meta:
         model = Update
-        fields = ('id', 'added_on', 'notes', 'pain_level')
+        fields = ('id', 'added_on', 'notes', 'pain_level', 'is_first_update', 'date_added')
 
 class TreatmentLinkSerializer(ModelSerializer):
     class Meta:
@@ -23,7 +24,7 @@ class TreatmentLinkSerializer(ModelSerializer):
 class HealingSerializer(ModelSerializer):
     class Meta:
         model = Healing
-        fields = ('id', 'date_added')
+        fields = ('id', 'date_added', 'added_on')
 
 class TreatmentSerializer(ModelSerializer):
     links = TreatmentLinkSerializer(many=True)
@@ -59,16 +60,38 @@ class HurtViewSet(ViewSet):
         serializer = HurtSerializer(hurt, context={'request': request})
         hurt_data = serializer.data
 
-        healings = Healing.objects.filter(hurt_healings__hurt=hurt).values()
-        for healing in healings:
-            healing.update({"type":"Healing"})
+        #serialize matching Healings for this Hurt into list of dicts, then add type
 
-        updates = hurt.update_set.all().values()
-        for update in updates:
-            update.update({"type": "Update"})
+        healings = Healing.objects.filter(hurt_healings__hurt=hurt)
+        healings_list = HealingSerializer(healings, many=True).data
+        for healing in healings_list:
+            healing.update({"history_type":"Healing"})
+        
+        # serialize matching updates. Add a type, and also a Created
+        updates = hurt.update_set.all()
+        updates_list = UpdateSerializer(updates, many=True).data
+        for update in updates_list:
+            if update["is_first_update"]:
+                update.update({"history_type": "Created on"})
+            else:
+                update.update({"history_type": "Update"})
+                
+        #combine the two lists into one called history
+        history = healings_list + updates_list
 
-        history = list(chain(healings, updates))
+        # check to see if "reversed" is in query params to sort by date desc
+        reversed = self.request.query_params.get("reverse", None)
 
+        reverse = False
+        if reversed is not None:
+            reverse = True
+
+        # sorting function to compare by datetime value of "added_on"
+        by_date = lambda row : row["added_on"]
+
+        history = sorted(history, key=by_date, reverse=reverse)
+
+        # add the history list as a k/v pair to the serialzied Hurt dict
         hurt_data["history"] = history
 
         return Response(hurt_data, status=status.HTTP_200_OK)
