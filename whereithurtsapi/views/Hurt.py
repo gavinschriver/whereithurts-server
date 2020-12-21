@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from whereithurtsapi.models import Hurt, Patient, Update, HurtTreatment, Treatment, TreatmentLink, Bodypart, Healing
 from django.utils import timezone
+from itertools import chain
 
 #Serializers
 
@@ -53,10 +54,24 @@ class HurtViewSet(ViewSet):
         hurt.owner = False
 
         if hurt.patient == Patient.objects.get(user=request.auth.user):
-            hurt.owner = True
+            hurt.owner = True    
 
         serializer = HurtSerializer(hurt, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        hurt_data = serializer.data
+
+        healings = Healing.objects.filter(hurt_healings__hurt=hurt).values()
+        for healing in healings:
+            healing.update({"type":"Healing"})
+
+        updates = hurt.update_set.all().values()
+        for update in updates:
+            update.update({"type": "Update"})
+
+        history = list(chain(healings, updates))
+
+        hurt_data["history"] = history
+
+        return Response(hurt_data, status=status.HTTP_200_OK)
 
 
     def list(self, request):
