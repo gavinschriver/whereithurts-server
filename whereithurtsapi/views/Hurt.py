@@ -67,7 +67,7 @@ class HurtViewSet(ViewSet):
         for healing in healings_list:
             healing.update({"history_type":"Healing"})
         
-        # serialize matching updates. Add a type, and also a Created
+        # serialize matching updates. Add a type, and also a Created if it was the first update
         updates = hurt.update_set.all()
         updates_list = UpdateSerializer(updates, many=True).data
         for update in updates_list:
@@ -79,7 +79,7 @@ class HurtViewSet(ViewSet):
         #combine the two lists into one called history
         history = healings_list + updates_list
 
-        # check to see if "reversed" is in query params to sort by date desc
+        # check to see if "reverse" is in query params to sort by date desc
         reversed = self.request.query_params.get("reverse", None)
 
         reverse = False
