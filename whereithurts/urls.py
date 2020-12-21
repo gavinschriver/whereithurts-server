@@ -13,7 +13,7 @@ Including anothe
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from whereithurtsapi.views import login_user, register_user, PatientViewSet, TreatmentViewSet, HurtViewSet, HealingViewSet, TreatmentTypeViewSet, BodypartViewSet, UpdateViewSet
+from whereithurtsapi.views import login_user, register_user, PatientViewSet, TreatmentViewSet, HurtViewSet, HealingViewSet, TreatmentTypeViewSet, BodypartViewSet, UpdateViewSet, ProfileViewSet
 from django.contrib import admin
 from django.conf.urls import include
 from django.urls import path
@@ -27,6 +27,7 @@ router.register(r'hurts', HurtViewSet, 'hurt')
 router.register(r'treatmenttypes', TreatmentTypeViewSet, 'treatmenttype')
 router.register(r'bodyparts', BodypartViewSet, 'bodypart')
 router.register(r'updates', UpdateViewSet, 'update')
+router.register(r'profiles', ProfileViewSet, 'profile')
 
 urlpatterns = [
     path('', include(router.urls)),

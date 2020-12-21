@@ -28,6 +28,11 @@ class Hurt(models.Model):
     def treatments(self):
         hurt_treatments = self.hurt_treatments.all()
         return [ht.treatment for ht in hurt_treatments]
+
+    @property
+    def healings(self):
+        hurt_healings= self.hurt_healings.all()
+        return [hh.healing for hh in hurt_healings]
     
     @property
     def updates(self):
