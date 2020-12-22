@@ -45,11 +45,14 @@ class ProfileViewSet(ViewSet):
         #retrieve qset of this patient's healings for the past week
         recent_healings =  patient.healing_set.filter(added_on__gte=timezone.now() - timedelta(days=7))
 
-
-        recent_healing_duration = recent_healings.aggregate(Sum('duration'))
-        formatted_healing_time = timedelta(seconds=recent_healing_duration["duration__sum"])
-        recent_treatments = Treatment.objects.filter(healing_treatments__healing__in=recent_healings)
-        recent_hurts = Hurt.objects.filter(hurt_healings__healing__in=recent_healings)
+        # only try to format healing time if there are any recent healings
+        if len(recent_healings) > 0:
+            recent_healing_duration = recent_healings.aggregate(Sum('duration'))
+            formatted_healing_time = timedelta(seconds=recent_healing_duration["duration__sum"])
+        else:
+            formatted_healing_time = 0
+        recent_treatments = Treatment.objects.filter(healing_treatments__healing__in=recent_healings).distinct()
+        recent_hurts = Hurt.objects.filter(hurt_healings__healing__in=recent_healings).distinct()
 
         snapshot["recent_healings"] = ProfileHealingSerializer(recent_healings, many=True, context={'requet': request}).data
         snapshot["recent_treatments"] = ProfileTreatmentSerializer(recent_treatments, many=True, context={'request': request}).data
