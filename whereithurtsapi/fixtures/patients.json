@@ -5,5 +5,12 @@
     "fields": {
         "user": 1
     }
+  },
+{
+    "model": "whereithurtsapi.patient",
+    "pk":  2,
+    "fields": {
+        "user": 2
+    }
   }
 ]

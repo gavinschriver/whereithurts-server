@@ -46,5 +46,44 @@
             "treatmenttype": 1,
             "notes": "get in the tubeeee"
         }
+    },
+    {
+        "model": "whereithurtsapi.treatment",
+        "pk": 5,
+        "fields": {
+            "added_by": 2,
+            "name": "couch stretch",
+            "added_on": "2020-08-17T14:18:10.909Z",
+            "bodypart": 5,
+            "treatmenttype": 3,
+            "notes": "variation w/ twist to the side",
+            "public": true
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatment",
+        "pk": 6,
+        "fields": {
+            "added_by": 2,
+            "name": "sciatic flosses ",
+            "added_on": "2020-08-17T14:18:10.909Z",
+            "bodypart": 3,
+            "treatmenttype": 3,
+            "notes": "back against wall, spine elevated off floor",
+            "public": true
+        }
+    },
+    {
+        "model": "whereithurtsapi.treatment",
+        "pk": 7,
+        "fields": {
+            "added_by": 2,
+            "name": "simple calf stretch",
+            "added_on": "2020-08-17T14:18:10.909Z",
+            "bodypart": 1,
+            "treatmenttype": 1,
+            "notes": "for gastroc nerve",
+            "public": true
+        }
     }
 ]
