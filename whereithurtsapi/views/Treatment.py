@@ -7,8 +7,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from whereithurtsapi.models import Treatment, TreatmentType, Bodypart, TreatmentLink, Patient, Hurt, HurtTreatment
 from django.utils import timezone
+from django.db.models import Q
 
-# Serializers 
+# Serializers
+
 
 class TreatmentLinkSerializer(ModelSerializer):
     """JSON Serializer for TreatmentLink model"""
@@ -16,23 +18,28 @@ class TreatmentLinkSerializer(ModelSerializer):
         model = TreatmentLink
         fields = ('id', 'linktext', 'linkurl')
 
+
 class TreatmentSerializer(ModelSerializer):
     """JSON serializer for the Treatment model """
     added_by = PatientSerializer(many=False)
     hurts = HurtSerializer(many=True)
     links = TreatmentLinkSerializer(many=True)
+
     class Meta:
         model = Treatment
-        fields = ('id','name', 'bodypart', 'treatmenttype', 'added_by', 'notes', 'public', 'links', 'hurts', 'owner')
+        fields = ('id', 'name', 'bodypart', 'treatmenttype',
+                  'added_by', 'notes', 'public', 'links', 'hurts', 'owner')
         depth = 1
 
-#Viewset
+# Viewset
+
 
 class TreatmentViewSet(ViewSet):
     """ViewSet for the Treatment model """
+
     def create(self, request):
         """ Handle  POST operations to /treatments
-        
+
         Return:
             Response --JSON Serialized Treatment instance
         """
@@ -46,9 +53,10 @@ class TreatmentViewSet(ViewSet):
         treatment.notes = request.data["notes"]
         treatment.added_on = timezone.now()
 
-        treatment.treatmenttype = TreatmentType.objects.get(pk=request.data["treatmenttype_id"])
-        treatment.bodypart = Bodypart.objects.get(pk=request.data["bodypart_id"])
-
+        treatment.treatmenttype = TreatmentType.objects.get(
+            pk=request.data["treatmenttype_id"])
+        treatment.bodypart = Bodypart.objects.get(
+            pk=request.data["bodypart_id"])
 
         # extract hurt ids from request and try to convert that collection to a queryset of Hurt instances
         hurt_ids = request.data["hurt_ids"]
@@ -57,7 +65,7 @@ class TreatmentViewSet(ViewSet):
             hurts = [Hurt.objects.get(pk=hurt_id) for hurt_id in hurt_ids]
         except Hurt.DoesNotExist:
             return Response({'message': 'request contains a hurt id for a non-existent hurt'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        
+
         # Try to save the new Treatment to the database
         try:
             treatment.save()
@@ -70,7 +78,7 @@ class TreatmentViewSet(ViewSet):
             hurt_treatment = HurtTreatment(hurt=hurt, treatment=treatment)
             hurt_treatment.save()
 
-        #save links, maybe?
+        # save links, maybe?
         treatment_links = request.data["treatment_links"]
 
         for treatment_link in treatment_links:
@@ -79,10 +87,10 @@ class TreatmentViewSet(ViewSet):
             new_treatment_link.linkurl = treatment_link["linkurl"]
             new_treatment_link.treatment = treatment
             new_treatment_link.save()
-        
-        serializer = TreatmentSerializer(treatment, context={'request': request})
-        return Response(serializer.data)
 
+        serializer = TreatmentSerializer(
+            treatment, context={'request': request})
+        return Response(serializer.data)
 
     def update(self, request, pk=None):
         """ Handle an update request for a treatment
@@ -95,13 +103,15 @@ class TreatmentViewSet(ViewSet):
         """
         treatment = Treatment.objects.get(pk=pk)
 
-        #save basic model values from request body
+        # save basic model values from request body
         treatment.name = request.data["name"]
         treatment.notes = request.data["notes"]
 
-        #save related forgein-key items
-        treatment.treatmenttype = TreatmentType.objects.get(pk=request.data["treatmenttype_id"])
-        treatment.bodypart = Bodypart.objects.get(pk=request.data["bodypart_id"])
+        # save related forgein-key items
+        treatment.treatmenttype = TreatmentType.objects.get(
+            pk=request.data["treatmenttype_id"])
+        treatment.bodypart = Bodypart.objects.get(
+            pk=request.data["bodypart_id"])
 
         # extract hurt ids from request and try to convert that collection to a queryset of Hurt instances
         hurt_ids = request.data["hurt_ids"]
@@ -110,15 +120,16 @@ class TreatmentViewSet(ViewSet):
             hurts = [Hurt.objects.get(pk=hurt_id) for hurt_id in hurt_ids]
         except Hurt.DoesNotExist:
             return Response({'message': 'request contains a hurt id for a non-existent hurt'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        
+
         # Try to save the updated Treatment to the database
         try:
             treatment.save()
         except ValidationError as ex:
             return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         # Prune hurts that were previously associated if their id is no longer in the hurt_id array
-        current_hurt_treatments = HurtTreatment.objects.filter(treatment=treatment) 
+        current_hurt_treatments = HurtTreatment.objects.filter(
+            treatment=treatment)
         current_hurt_treatments.exclude(hurt__in=hurts).delete()
 
         # for the hurts that were still in (or are now added to) that array of ids, see if the relationship exists already; if not, create it
@@ -126,7 +137,8 @@ class TreatmentViewSet(ViewSet):
             try:
                 current_hurt_treatments.get(hurt=hurt)
             except HurtTreatment.DoesNotExist:
-                new_hurt_treatment = HurtTreatment(hurt=hurt, treatment=treatment)
+                new_hurt_treatment = HurtTreatment(
+                    hurt=hurt, treatment=treatment)
                 new_hurt_treatment.save()
 
         # delete pre-existing links, then save / re-save links according to request "treatment_link" list
@@ -141,26 +153,53 @@ class TreatmentViewSet(ViewSet):
             new_treatment_link.linkurl = treatment_link["linkurl"]
             new_treatment_link.treatment = treatment
             new_treatment_link.save()
-        
-        serializer = TreatmentSerializer(treatment, context={'request': request})
-        return Response(serializer.data)
 
+        serializer = TreatmentSerializer(
+            treatment, context={'request': request})
+        return Response(serializer.data)
 
     def list(self, request):
         """ Access a list of some/all Treatments """
         treatments = Treatment.objects.all()
 
-        #e.g. /treatments?patient_id=1
+        # e.g. /treatments?patient_id=1
         patient_id = self.request.query_params.get('patient_id', None)
         if patient_id is not None:
             treatments = treatments.filter(added_by_id=patient_id)
-        
+
+        # e.g. /treatments?bodypart_id=1
+        bodypart_id = self.request.query_params.get('bodypart_id', None)
+        if bodypart_id is not None:
+            treatments = treatments.filter(bodypart_id=bodypart_id)
+
+        # e.g. /treatments?treatmenttype_id=1
+        treatmenttype_id = self.request.query_params.get(
+            'treatmenttype_id', None)
+        if treatmenttype_id is not None:
+            treatments = treatments.filter(treatmenttype_id=treatmenttype_id)
+
+        # e.g. /treatments?owner
+        owner = self.request.query_params.get('owner', None)
+        if owner is not None:
+            treatments = treatments.filter(added_by_id=request.auth.user.patient.id)
+
+        # e.g. /treatments?q=foot
+        search_terms = self.request.query_params.get('q', None)
+        if search_terms is not None:
+            treatments = treatments.filter(Q(name__contains=search_terms) | Q(notes__contains=search_terms) | Q(bodypart__name__contains=search_terms))
+
+        # e.g. make sure only results after any filtering are either belonging to current user or public
+        treatments = treatments.filter(Q(added_by_id=request.auth.user.patient.id) | Q(public=True))
+
+        # add dynamic prop for client to use in determining whether a treatment's edit/delete controls should be visible
         for treatment in treatments:
             treatment.owner = False
             if treatment.added_by == Patient.objects.get(user=request.auth.user):
                 treatment.owner = True
+            
 
-        serializer = TreatmentSerializer(treatments, many=True, context={'request': request})
+        serializer = TreatmentSerializer(
+            treatments, many=True, context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
@@ -170,20 +209,17 @@ class TreatmentViewSet(ViewSet):
             treatment.owner = False
             if treatment.added_by == Patient.objects.get(user=request.auth.user):
                 treatment.owner = True
-            serializer = TreatmentSerializer(treatment, context={'request': request})
+            serializer = TreatmentSerializer(
+                treatment, context={'request': request})
             return Response(serializer.data)
         except Treatment.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
-
     def destroy(self, request, pk=None):
         """ Delete a single Treatment """
-        try: 
+        try:
             treatment = Treatment.objects.get(pk=pk)
         except Treatment.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
         treatment.delete()
         return Response({}, status=status.HTTP_204_NO_CONTENT)
-
-
-

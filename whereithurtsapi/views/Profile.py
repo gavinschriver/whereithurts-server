@@ -22,7 +22,7 @@ class ProfileTreatmentSerializer(ModelSerializer):
 class ProfileHurtSerializer(ModelSerializer):
     class Meta:
         model = Hurt
-        fields = ('id', 'name', 'date_added', 'pain_level')
+        fields = ('id', 'name', 'date_added', 'pain_level', 'latest_pain_level')
 
 
 class ProfileViewSet(ViewSet):

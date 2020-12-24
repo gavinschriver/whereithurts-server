@@ -40,7 +40,7 @@ class HurtSerializer(ModelSerializer):
     updates = UpdateSerializer(many=True)
     class Meta:
         model = Hurt
-        fields = ('id','patient', 'healings', 'date_added', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level', 'healing_count', 'treatments', 'updates', 'last_update', 'first_update_id', 'owner')
+        fields = ('id','patient', 'healings', 'date_added', 'bodypart', 'name', 'added_on', 'is_active', 'notes', 'pain_level', 'healing_count', 'treatments', 'updates', 'last_update', 'first_update_id', 'owner', 'latest_pain_level')
         depth = 1
 
 #Viewset 

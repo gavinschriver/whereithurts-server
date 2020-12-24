@@ -33,6 +33,11 @@ class Hurt(models.Model):
     def healings(self):
         hurt_healings= self.hurt_healings.all()
         return [hh.healing for hh in hurt_healings]
+
+    @property 
+    def latest_pain_level(self):
+        last_update = self.update_set.all().order_by('-added_on')[0]
+        return last_update.pain_level
     
     @property
     def updates(self):
