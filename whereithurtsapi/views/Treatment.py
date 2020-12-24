@@ -51,6 +51,7 @@ class TreatmentViewSet(ViewSet):
 
         treatment.name = request.data["name"]
         treatment.notes = request.data["notes"]
+        treatment.public = request.data["public"]
         treatment.added_on = timezone.now()
 
         treatment.treatmenttype = TreatmentType.objects.get(
@@ -106,6 +107,7 @@ class TreatmentViewSet(ViewSet):
         # save basic model values from request body
         treatment.name = request.data["name"]
         treatment.notes = request.data["notes"]
+        treatment.public = request.data["public"]
 
         # save related forgein-key items
         treatment.treatmenttype = TreatmentType.objects.get(
