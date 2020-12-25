@@ -24,6 +24,7 @@ class UpdateViewSet(ViewSet):
             update = Update.objects.get(pk=pk)
         except Update.DoesNotExist:
             return Response({'message': 'Update does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            
         
         serializer = UpdateSerializer(update, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)

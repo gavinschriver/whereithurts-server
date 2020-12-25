@@ -22,6 +22,14 @@ class Update(models.Model):
         return self.added_on.strftime('%-m/%d/%Y')
 
     @property
+    def owner(self):
+        return self._owner
+
+    @owner.setter
+    def owner(self, value):
+        self._owner = value
+
+    @property
     def pain_level_difference(self):
         try:
             previous = self.get_previous_by_added_on(hurt=self.hurt)
