@@ -180,25 +180,32 @@ class TreatmentViewSet(ViewSet):
         if treatmenttype_id is not None:
             treatments = treatments.filter(treatmenttype_id=treatmenttype_id)
 
-        # e.g. /treatments?owner
+        # e.g. /treatments?owner=1
         owner = self.request.query_params.get('owner', None)
         if owner is not None:
-            treatments = treatments.filter(added_by_id=request.auth.user.patient.id)
+            treatments = treatments.filter(
+                added_by_id=request.auth.user.patient.id)
+
+        # e.g. /treatments?hurt_id=1
+        hurt_id = self.request.query_params.get('hurt_id', None)
+        if hurt_id is not None:
+            treatments = treatments.filter(hurt_treatments__hurt_id=hurt_id)
 
         # e.g. /treatments?q=foot
         search_terms = self.request.query_params.get('q', None)
         if search_terms is not None:
-            treatments = treatments.filter(Q(name__contains=search_terms) | Q(notes__contains=search_terms) | Q(bodypart__name__contains=search_terms))
+            treatments = treatments.filter(Q(name__contains=search_terms) | Q(notes__contains=search_terms) | Q(
+                bodypart__name__contains=search_terms) | Q(treatmenttype__name__contains=search_terms))
 
         # e.g. make sure only results after any filtering are either belonging to current user or public
-        treatments = treatments.filter(Q(added_by_id=request.auth.user.patient.id) | Q(public=True))
+        treatments = treatments.filter(
+            Q(added_by_id=request.auth.user.patient.id) | Q(public=True))
 
         # add dynamic prop for client to use in determining whether a treatment's edit/delete controls should be visible
         for treatment in treatments:
             treatment.owner = False
             if treatment.added_by == Patient.objects.get(user=request.auth.user):
                 treatment.owner = True
-            
 
         serializer = TreatmentSerializer(
             treatments, many=True, context={'request': request})
