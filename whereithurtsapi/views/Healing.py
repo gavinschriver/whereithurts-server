@@ -146,7 +146,28 @@ class HealingViewSet(ViewSet):
 
     def list(self, request):
         """ Access a list of some/all Healings """
-        healings = Healing.objects.all()
+
+        # order by date descending (newest first) by default
+        healings = Healing.objects.all().order_by('-added_on')
+
+        order = self.request.query_params.get('order_by', None)
+        direction = self.request.query_params.get('direction', None)
+        hurt_id = self.request.query_params.get('hurt_id', None)
+
+        # e.g. /healings?hurt_id=1
+        if hurt_id is not None:
+            healings = healings.filter(hurt_healings__hurt_id=hurt_id)
+
+        # e.g. /healings?order_by=added_on&direction=asc
+        if order is not None:
+            order_filter = order
+            if direction is not None:
+                if direction == "asc":
+                    order_filter = f'{order}'
+                elif direction == "desc":
+                    order_filter = f'-{order}'
+
+            healings = healings.order_by(order_filter)
 
         # e.g. /healings?patient_id=1
         patient_id = self.request.query_params.get('patient_id', None)
