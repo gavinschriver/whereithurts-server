@@ -41,6 +41,11 @@ class UpdateViewSet(ViewSet):
                 return Response({'message': 'not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
             updates = updates.filter(hurt__patient_id=patient_id)
         
+        hurt_id = self.request.query_params.get('hurt_id', None)
+        if hurt_id is not None:
+            updates = updates.filter(hurt_id=hurt_id)
+
+
         serializer = UpdateSerializer(updates, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
