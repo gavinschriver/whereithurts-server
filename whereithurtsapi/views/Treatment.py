@@ -8,6 +8,8 @@ from rest_framework import status
 from whereithurtsapi.models import Treatment, TreatmentType, Bodypart, TreatmentLink, Patient, Hurt, HurtTreatment
 from django.utils import timezone
 from django.db.models import Q
+from rest_framework.decorators import action
+
 
 # Serializers
 
@@ -232,3 +234,39 @@ class TreatmentViewSet(ViewSet):
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
         treatment.delete()
         return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['post', 'delete'])
+    def tag_hurt(self, request, pk=None):
+        try:
+            treatment = Treatment.objects.get(pk=pk)
+        except Treatment.DoesNotExist:
+            return Response({'message': 'Treatment Does not Exist'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            hurt = Hurt.objects.get(pk=request.data["hurt_id"])
+        except Hurt.DoesNotExist:
+            return Response({'message': 'Hurt does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+        #
+        if request.method == "POST":
+            try:
+                hurt_treatment = HurtTreatment.objects.get(
+                    hurt=hurt, treatment=treatment)
+                return Response({'message': 'this treatment has already been tagged with this hurt'}, status=status.HTTP_400_BAD_REQUEST)
+            except HurtTreatment.DoesNotExist:
+                hurt_treatment = HurtTreatment()
+                hurt_treatment.hurt = hurt
+                hurt_treatment.treatment = treatment
+                hurt_treatment.save()
+                return Response({}, status.HTTP_201_CREATED)
+
+        elif request.method == "DELETE":
+            try:
+                hurt_treatment = HurtTreatment.objects.get(
+                    hurt=hurt, treatment=treatment)
+                hurt_treatment.delete()
+                return Response({}, status=status.HTTP_204_NO_CONTENT)
+            except HurtTreatment.DoesNotExist:
+                return Response({'message': 'hurt has not been tagged on this treatment'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({}, status=status.HTTP_405_METHOD_NOT_ALLOWED)

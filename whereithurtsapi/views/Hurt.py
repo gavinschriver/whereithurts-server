@@ -133,6 +133,7 @@ class HurtViewSet(ViewSet):
             # e.g. order_by=added_on-asc ; 'added_on' will be order, 'asc' will be direction
             order = order_by.split('-')[0]
             direction = order_by.split('-')[1]
+            #if order is by 'recently updated', annotate the hurts with a value of their most recent update and order by that value 
             if order == 'recently_updated':
                 hurts = hurts.annotate(
                     most_recent_update=Max('update__added_on'))

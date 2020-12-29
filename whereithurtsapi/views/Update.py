@@ -45,6 +45,16 @@ class UpdateViewSet(ViewSet):
         if hurt_id is not None:
             updates = updates.filter(hurt_id=hurt_id)
 
+        order_by = self.request.query_params.get('order_by', None)
+        if order_by is not None:
+            order = order_by.split('-')[0]
+            direction = order_by.split('-')[1]
+            
+            if direction == "desc":
+                updates = updates.order_by(f"-{order}")
+            if direction == "asc":
+                updates = updates.order_by(f"{order}")
+
 
         serializer = UpdateSerializer(updates, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
