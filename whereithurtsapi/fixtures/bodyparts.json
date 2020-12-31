@@ -3,7 +3,8 @@
         "model": "whereithurtsapi.bodypart",
         "pk": 1,
         "fields": {
-           "name": "Many/All"
+           "name": "Many/All",
+           "image": "icons/bodyparts/black_plus.png"
         }
     },
     {
