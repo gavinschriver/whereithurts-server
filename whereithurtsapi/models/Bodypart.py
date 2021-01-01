@@ -7,4 +7,5 @@ class Bodypart(models.Model):
 
     Defined internally"""
     name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='icons/bodyparts', height_field=None, width_field=None, null=True, max_length=None)
+    hurt_image = models.ImageField(upload_to='icons/bodyparts/hurts', height_field=None, width_field=None, null=True, max_length=None)
+    treatment_image = models.ImageField(upload_to='icons/bodyparts/treatments', height_field=None, width_field=None, null=True, max_length=None)

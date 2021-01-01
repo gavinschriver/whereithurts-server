@@ -9,7 +9,7 @@ class BodypartSerializer(ModelSerializer):
     """ JSON serializer for the Bodypart model  """
     class Meta:
         model = Bodypart
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'hurt_image']
         depth = 1
 
     
