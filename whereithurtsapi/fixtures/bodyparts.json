@@ -3,70 +3,83 @@
         "model": "whereithurtsapi.bodypart",
         "pk": 1,
         "fields": {
-           "name": "Many/All"
+           "name": "Many/All",
+           "hurt_image": "icons/bodyparts/hurts/many-all.png"
         }
     },
     {
         "model": "whereithurtsapi.bodypart",
         "pk": 2,
         "fields": {
-           "name": "Foot"
+           "name": "Foot",
+           "hurt_image": "icons/bodyparts/hurts/foot.png"
         }
     },
     {
         "model": "whereithurtsapi.bodypart",
         "pk": 3,
         "fields": {
-           "name": "Ankle/Lower Leg"
+           "name": "Ankle/Lower Leg",
+           "hurt_image": "icons/bodyparts/hurts/ankle-lowerleg.png"
+
         }
     },
     {
         "model": "whereithurtsapi.bodypart",
         "pk": 4,
         "fields": {
-           "name": "Knee"
+           "name": "Knee",
+           "hurt_image": "icons/bodyparts/hurts/knee.png"
+
         }
     },
     {
         "model": "whereithurtsapi.bodypart",
         "pk": 5,
         "fields": {
-           "name": "Thigh/Hip/Groin/Pelvis"
+           "name": "Thigh/Hip/Groin/Pelvis",
+           "hurt_image": "icons/bodyparts/hurts/thigh-hips-groin-pelvis.png"
+
         }
     },
     {
         "model": "whereithurtsapi.bodypart",
         "pk": 6,
         "fields": {
-           "name": "Spine/Lower Back"
+           "name": "Spine/Lower Back",
+           "hurt_image": "icons/bodyparts/hurts/spine-lowerback.png"
         }
     },
     {
         "model": "whereithurtsapi.bodypart",
         "pk": 7,
         "fields": {
-           "name": "Core/Chest"
+           "name": "Core/Chest",
+           "hurt_image": "icons/bodyparts/hurts/core-chest.png"
         }
     },
     {
         "model": "whereithurtsapi.bodypart",
         "pk": 8,
         "fields": {
-           "name": "Shoulder/Neck/Upper Arm"
+           "name": "Shoulder/Neck/Upper Arm",
+           "hurt_image": "icons/bodyparts/hurts/shoulder-neck-upperarm.png"
         }
     },
     {
         "model": "whereithurtsapi.bodypart",
         "pk": 9,
         "fields": {
-           "name": "Elbow"
+           "name": "Elbow",
+           "hurt_image": "icons/bodyparts/hurts/elbow.png"
         }
     },
     {
         "model": "whereithurtsapi.bodypart",
         "pk": 10,
         "fields": {
-           "name": "Forearm/Wrist/Hand"
+           "name": "Forearm/Wrist/Hand",
+           "hurt_image": "icons/bodyparts/hurts/forearm-wrist-hand.png"
         }
     }
 ]

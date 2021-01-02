@@ -6,3 +6,4 @@ class TreatmentType(models.Model):
     
     Defined internally"""
     name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='icons/treatmenttypes', height_field=None, width_field=None, null=True, max_length=None)

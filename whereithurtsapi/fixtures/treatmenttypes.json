@@ -3,28 +3,33 @@
         "model": "whereithurtsapi.treatmenttype",
         "pk": 1,
         "fields": {
-           "name": "Misc."
+           "name": "Misc.",
+           "image": "icons/treatmenttypes/misc.png"
         }
     },
     {
         "model": "whereithurtsapi.treatmenttype",
         "pk": 2,
         "fields": {
-           "name": "Strength and Conditioning"
+           "name": "Strength and Conditioning",
+           "image": "icons/treatmenttypes/strength-and-conditioning.png"
+
         }
     },
     {
         "model": "whereithurtsapi.treatmenttype",
         "pk": 3,
         "fields": {
-           "name": "Mobility"
+           "name": "Mobility",
+           "image": "icons/treatmenttypes/mobility.png"
         }
     },
     {
         "model": "whereithurtsapi.treatmenttype",
         "pk": 4,
         "fields": {
-           "name": "Soft Tissue Work"
+           "name": "Soft Tissue Work",
+           "image": "icons/treatmenttypes/soft-tissue-work.png"
         }
     }
 ]

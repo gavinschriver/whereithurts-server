@@ -95,6 +95,7 @@ class UpdateViewSet(ViewSet):
         if not req_patient.id == update.hurt.patient.id:
             return Response({'message': 'not authorized'}, status=status.HTTP_401_UNAUTHORIZED)
         
+        update.hurt = Hurt.objects.get(pk=request.data["hurt_id"])
         update.notes = request.data["notes"]
         update.pain_level = request.data["pain_level"]
 

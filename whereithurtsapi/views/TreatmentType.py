@@ -9,7 +9,7 @@ class TreatmentTypeSerializer(ModelSerializer):
     """ JSON serializer for the TreatmentType model  """
     class Meta:
         model = TreatmentType
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'image']
         depth = 1
 
     
