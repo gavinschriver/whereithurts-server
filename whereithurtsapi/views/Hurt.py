@@ -150,9 +150,9 @@ class HurtViewSet(ViewSet):
             if hurt.patient == Patient.objects.get(user=request.auth.user):
                 hurt.owner = True
 
-        serializer = HurtSerializer(
-            hurts, many=True, context={'request': request})
-        return Response(serializer.data)
+        serializedHurts = HurtSerializer(
+            hurts, many=True, context={'request': request}).data
+        return Response(serializedHurts)
 
     def create(self, request):
         """ Handle POST operations to /hurts

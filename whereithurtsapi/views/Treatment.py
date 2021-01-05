@@ -31,7 +31,7 @@ class TreatmentSerializer(ModelSerializer):
         model = Treatment
         fields = ('id', 'name', 'bodypart', 'treatmenttype',
                   'added_by', 'notes', 'public', 'links', 'hurts', 'owner')
-        depth = 1
+        depth = 2
 
 # Viewset
 
