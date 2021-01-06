@@ -29,7 +29,7 @@
         "pk": 4,
         "fields": {
            "name": "Soft Tissue Work",
-           "image": "icons/treatmenttypes/soft-tissue-work.png"
+           "image": "icons/treatmenttypes/soft-tissue-work-foot.png"
         }
     }
 ]

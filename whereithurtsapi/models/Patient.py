@@ -33,6 +33,10 @@ class Patient(models.Model):
     @property
     def healings(self):
         return self.healing_set.all()
+    
+    @property
+    def treatments(self):
+        return self.treatment_set.all()
 
     """ property to return all updates added by this user """
     @property
