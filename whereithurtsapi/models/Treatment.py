@@ -22,6 +22,10 @@ class Treatment(models.Model):
         return [ht.hurt for ht in hurt_treatments]
 
     @property
+    def date_added(self):
+        return self.added_on.strftime('%-m/%d/%Y')
+
+    @property
     def owner(self):
         return self._owner
     
