@@ -12,6 +12,17 @@ from django.db.models import Sum
 
 # Serializers
 
+class SimpleTreatmentSerializer(ModelSerializer):
+    class Meta: 
+        model = Treatment
+        fields = ('id', 'name', 'notes')
+
+class SimpleHealingSerializer(ModelSerializer):
+    treatments = SimpleTreatmentSerializer(many=True)
+    class Meta:
+        model = Healing
+        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments')
+
 
 class HealingSerializer(ModelSerializer):
     """JSON serializer for the Healing model """
@@ -187,7 +198,7 @@ class HealingViewSet(ViewSet):
             healings = paginate(healings, page, page_size)
 
         # serialize paginated healings     
-        healinglist = HealingSerializer(
+        healinglist = SimpleHealingSerializer(
             healings, many=True, context={'request': request})
 
         # create response object
