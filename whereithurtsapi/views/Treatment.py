@@ -209,9 +209,13 @@ class TreatmentViewSet(ViewSet):
             if treatment.added_by == Patient.objects.get(user=request.auth.user):
                 treatment.owner = True
 
-        serializer = TreatmentSerializer(
+        treatmentList = TreatmentSerializer(
             treatments, many=True, context={'request': request})
-        return Response(serializer.data)
+
+        response = {}
+        response["treatments"] = treatmentList.data
+        response["count"] = len(treatmentList.data)
+        return Response(response)
 
     def retrieve(self, request, pk=None):
         """ Access a single Treatment """
