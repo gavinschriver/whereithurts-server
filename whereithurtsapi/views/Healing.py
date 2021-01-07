@@ -6,10 +6,22 @@ from rest_framework import status
 from whereithurtsapi.models import Healing, Patient, Treatment, HealingTreatment, HurtHealing, Hurt
 from whereithurtsapi.views.Treatment import TreatmentSerializer
 from whereithurtsapi.views.Hurt import HurtSerializer
+from whereithurtsapi.helpers import paginate
 from django.utils import timezone
 from django.db.models import Sum
 
 # Serializers
+
+class SimpleTreatmentSerializer(ModelSerializer):
+    class Meta: 
+        model = Treatment
+        fields = ('id', 'name', 'notes')
+
+class SimpleHealingSerializer(ModelSerializer):
+    treatments = SimpleTreatmentSerializer(many=True)
+    class Meta:
+        model = Healing
+        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments')
 
 
 class HealingSerializer(ModelSerializer):
@@ -153,6 +165,9 @@ class HealingViewSet(ViewSet):
         order = self.request.query_params.get('order_by', None)
         direction = self.request.query_params.get('direction', None)
         hurt_id = self.request.query_params.get('hurt_id', None)
+        patient_id = self.request.query_params.get('patient_id', None)
+        page = request.query_params.get('page', None)
+        page_size = request.query_params.get('page_size', 10)
 
         # e.g. /healings?hurt_id=1
         if hurt_id is not None:
@@ -170,17 +185,26 @@ class HealingViewSet(ViewSet):
             healings = healings.order_by(order_filter)
 
         # e.g. /healings?patient_id=1
-        patient_id = self.request.query_params.get('patient_id', None)
         if patient_id is not None:
             healings = healings.filter(patient_id=patient_id)
 
-        healinglist = HealingSerializer(
-            healings, many=True, context={'request': request})
 
+        #establish total time and count of current list after all filters are applied
         totalHealingTime = healings.aggregate(Sum('duration'))
 
+        count = len(healings)
+
+        if page is not None: 
+            healings = paginate(healings, page, page_size)
+
+        # serialize paginated healings     
+        healinglist = SimpleHealingSerializer(
+            healings, many=True, context={'request': request})
+
+        # create response object
         healingData = {}
         healingData["healings"] = healinglist.data
+        healingData["count"] = count
         healingData["total_healing_time"] = totalHealingTime["duration__sum"]
         return Response(healingData)
 

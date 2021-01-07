@@ -1,3 +1,4 @@
+from whereithurtsapi.helpers.paginate import paginate
 from whereithurtsapi.views.Hurt import HurtSerializer
 from whereithurtsapi.views.Patient import PatientSerializer
 from django.core.exceptions import ValidationError
@@ -199,9 +200,13 @@ class TreatmentViewSet(ViewSet):
             treatments = treatments.filter(Q(name__contains=search_terms) | Q(notes__contains=search_terms) | Q(
                 bodypart__name__contains=search_terms) | Q(treatmenttype__name__contains=search_terms))
 
-        # e.g. make sure only results after any filtering are either belonging to current user or public
+        # e.g. make sure only results after any filtering are either belonging to current user OR public
         treatments = treatments.filter(
             Q(added_by_id=request.auth.user.patient.id) | Q(public=True))
+
+        # e.g. /treatments?page=1
+        page = request.query_params.get('page', None)
+        page_size = request.query_params.get('page_size', 10)
 
         # add dynamic prop for client to use in determining whether a treatment's edit/delete controls should be visible
         for treatment in treatments:
@@ -209,9 +214,21 @@ class TreatmentViewSet(ViewSet):
             if treatment.added_by == Patient.objects.get(user=request.auth.user):
                 treatment.owner = True
 
-        serializer = TreatmentSerializer(
+        #establish count of current list after all filtering
+        count = len(treatments)
+
+        if page is not None: 
+            treatments = paginate(treatments, page, page_size)
+
+        #serialized paginated treatments
+
+        treatmentList = TreatmentSerializer(
             treatments, many=True, context={'request': request})
-        return Response(serializer.data)
+
+        response = {}
+        response["treatments"] = treatmentList.data
+        response["count"] = count
+        return Response(response)
 
     def retrieve(self, request, pk=None):
         """ Access a single Treatment """
