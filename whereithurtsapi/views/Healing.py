@@ -32,7 +32,7 @@ class HealingSerializer(ModelSerializer):
     class Meta:
         model = Healing
         fields = ('id', 'patient', 'notes', 'duration',
-                  'added_on', 'treatments', 'hurts', 'date_added')
+                  'added_on', 'treatments', 'hurts', 'date_added', 'owner')
         depth = 1
 
 # Viewset
@@ -212,6 +212,9 @@ class HealingViewSet(ViewSet):
         """ Access a single Healing """
         try:
             healing = Healing.objects.get(pk=pk)
+            healing.owner = False 
+            if healing.patient == Patient.objects.get(user=request.auth.user):
+                healing.owner = True
             serializer = HealingSerializer(
                 healing, context={'request': request})
             return Response(serializer.data)
