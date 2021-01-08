@@ -22,3 +22,11 @@ class Healing(models.Model):
     @property
     def date_added(self):
         return self.added_on.strftime('%-m/%d/%Y')
+
+    @property 
+    def owner(self):
+        return self._owner
+
+    @owner.setter
+    def owner(self, value):
+        self._owner = value
