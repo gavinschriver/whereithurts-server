@@ -29,7 +29,7 @@ SECRET_KEY = 'h1j2*^2vk8fi%cx98k$q@r&a9)b-5-ck&^fpw$*4yf#pgb3us5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['gavinschriver.pythonanywhere.com', 'localhost']
 
 
 # Application definition
