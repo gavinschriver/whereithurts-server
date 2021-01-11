@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.views.generic.base import View
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, IntegerField
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
