@@ -7,7 +7,7 @@ from rest_framework.serializers import ModelSerializer, IntegerField
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from whereithurtsapi.models import Treatment, TreatmentType, Bodypart, TreatmentLink, Patient, Hurt, HurtTreatment
+from whereithurtsapi.models import Treatment, TreatmentType, Bodypart, TreatmentLink, Patient, Hurt, HurtTreatment, Healing
 from django.utils import timezone
 from django.db.models import Q
 from rest_framework.decorators import action
@@ -22,11 +22,21 @@ class TreatmentLinkSerializer(ModelSerializer):
         model = TreatmentLink
         fields = ('id', 'linktext', 'linkurl')
 
+class SimpleHurtSerializer(ModelSerializer):
+    """ Simplified serializer for embedding Hurts on Treatment list """
+    class Meta:
+        model = Hurt
+        fields = ('id', 'bodypart', 'date_added', 'healing_count', 'patient',
+                  'name', 'notes', 'latest_pain_level', 'is_active', 'last_update')
+        depth = 1
+
+ ## SimpleHurtSerializer was added to keep full Healing serializations from being embeded on a Treatment's Hurts;
+ # See HurtSerializer in views.Hurt.py for details on what's included in a full Hurt serialization     
 
 class TreatmentSerializer(ModelSerializer):
     """JSON serializer for the Treatment model """
     added_by = PatientSerializer(many=False)
-    hurts = HurtSerializer(many=True)
+    hurts = SimpleHurtSerializer(many=True)
     links = TreatmentLinkSerializer(many=True)
 
     class Meta:
@@ -210,7 +220,7 @@ class TreatmentViewSet(ViewSet):
             if direction is not None:
                 if direction == "desc":
                     order_filter = f'-{order_by}'
-            
+
             treatments = treatments.order_by(order_filter)
 
         # e.g. make sure only results after any filtering are either belonging to current user OR public
