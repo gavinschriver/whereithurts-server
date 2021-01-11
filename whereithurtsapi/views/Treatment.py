@@ -1,12 +1,13 @@
+from django.db.models.aggregates import Count
 from whereithurtsapi.helpers.paginate import paginate
 from whereithurtsapi.views.Hurt import HurtSerializer
 from whereithurtsapi.views.Patient import PatientSerializer
 from django.core.exceptions import ValidationError
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, IntegerField
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from whereithurtsapi.models import Treatment, TreatmentType, Bodypart, TreatmentLink, Patient, Hurt, HurtTreatment
+from whereithurtsapi.models import Treatment, TreatmentType, Bodypart, TreatmentLink, Patient, Hurt, HurtTreatment, Healing
 from django.utils import timezone
 from django.db.models import Q
 from rest_framework.decorators import action
@@ -21,18 +22,29 @@ class TreatmentLinkSerializer(ModelSerializer):
         model = TreatmentLink
         fields = ('id', 'linktext', 'linkurl')
 
+class SimpleHurtSerializer(ModelSerializer):
+    """ Simplified serializer for embedding Hurts on Treatment list """
+    class Meta:
+        model = Hurt
+        fields = ('id', 'bodypart', 'date_added', 'healing_count', 'patient',
+                  'name', 'notes', 'latest_pain_level', 'is_active', 'last_update')
+        depth = 1
+
+ ## SimpleHurtSerializer was added to keep full Healing serializations from being embeded on a Treatment's Hurts;
+ # See HurtSerializer in views.Hurt.py for details on what's included in a full Hurt serialization     
 
 class TreatmentSerializer(ModelSerializer):
     """JSON serializer for the Treatment model """
     added_by = PatientSerializer(many=False)
-    hurts = HurtSerializer(many=True)
+    hurts = SimpleHurtSerializer(many=True)
     links = TreatmentLinkSerializer(many=True)
 
     class Meta:
         model = Treatment
         fields = ('id', 'name', 'bodypart', 'treatmenttype',
-                  'added_by', 'notes', 'public', 'links', 'hurts', 'owner')
+                  'added_by', 'notes', 'public', 'links', 'hurts', 'owner', 'healing_count', 'added_on')
         depth = 2
+
 
 # Viewset
 
@@ -165,7 +177,8 @@ class TreatmentViewSet(ViewSet):
 
     def list(self, request):
         """ Access a list of some/all Treatments """
-        treatments = Treatment.objects.all()
+        treatments = Treatment.objects.all().annotate(
+            healings=Count('healing_treatments'))
 
         # e.g. /treatments?patient_id=1
         patient_id = self.request.query_params.get('patient_id', None)
@@ -200,6 +213,16 @@ class TreatmentViewSet(ViewSet):
             treatments = treatments.filter(Q(name__contains=search_terms) | Q(notes__contains=search_terms) | Q(
                 bodypart__name__contains=search_terms) | Q(treatmenttype__name__contains=search_terms))
 
+        order_by = self.request.query_params.get('order_by', None)
+        direction = self.request.query_params.get('direction', None)
+        if order_by is not None:
+            order_filter = order_by
+            if direction is not None:
+                if direction == "desc":
+                    order_filter = f'-{order_by}'
+
+            treatments = treatments.order_by(order_filter)
+
         # e.g. make sure only results after any filtering are either belonging to current user OR public
         treatments = treatments.filter(
             Q(added_by_id=request.auth.user.patient.id) | Q(public=True))
@@ -214,13 +237,13 @@ class TreatmentViewSet(ViewSet):
             if treatment.added_by == Patient.objects.get(user=request.auth.user):
                 treatment.owner = True
 
-        #establish count of current list after all filtering
+        # establish count of current list after all filtering
         count = len(treatments)
 
-        if page is not None: 
+        if page is not None:
             treatments = paginate(treatments, page, page_size)
 
-        #serialized paginated treatments
+        # serialized paginated treatments
 
         treatmentList = TreatmentSerializer(
             treatments, many=True, context={'request': request})
