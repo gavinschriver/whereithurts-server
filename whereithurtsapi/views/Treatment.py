@@ -1,13 +1,12 @@
 from django.db.models.aggregates import Count
 from whereithurtsapi.helpers.paginate import paginate
-from whereithurtsapi.views.Hurt import HurtSerializer
 from whereithurtsapi.views.Patient import PatientSerializer
 from django.core.exceptions import ValidationError
-from rest_framework.serializers import ModelSerializer, IntegerField
+from rest_framework.serializers import ModelSerializer
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
-from whereithurtsapi.models import Treatment, TreatmentType, Bodypart, TreatmentLink, Patient, Hurt, HurtTreatment, Healing
+from whereithurtsapi.models import Treatment, TreatmentType, Bodypart, TreatmentLink, Patient, Hurt, HurtTreatment
 from django.utils import timezone
 from django.db.models import Q
 from rest_framework.decorators import action
