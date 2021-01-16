@@ -100,7 +100,7 @@ class HealingViewSet(ViewSet):
 
         # serialize the new healing and send it back
         serialzier = HealingSerializer(healing, context={'request': request})
-        return Response(serialzier.data)
+        return Response(serialzier.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
         """ Handle an update request for a Healing
