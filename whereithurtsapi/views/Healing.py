@@ -79,8 +79,8 @@ class HealingViewSet(ViewSet):
 
         try:
             hurts = [Hurt.objects.get(pk=hurt_id) for hurt_id in hurt_ids]
-        except Treatment.DoesNotExist:
-            return Response({'message': 'request contains a treatment id for a non-existent treatment'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except Hurt.DoesNotExist:
+            return Response({'message': 'request contains a hurt id for a non-existent hurt'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         # Try to save the new Healing to the database
         try:

@@ -8,7 +8,7 @@ class Hurt(models.Model):
     bodypart = models.ForeignKey("Bodypart", on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=100)
     added_on = models.DateTimeField()
-    is_active = models.BooleanField()
+    is_active = models.BooleanField(default=True)
 
     @property
     def notes(self):
