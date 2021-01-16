@@ -12,16 +12,24 @@ from django.db.models import Sum
 
 # Serializers
 
+
 class SimpleTreatmentSerializer(ModelSerializer):
-    class Meta: 
+    class Meta:
         model = Treatment
         fields = ('id', 'name', 'notes')
 
+
+class SimpleHurtSerializer(ModelSerializer):
+    class Meta:
+        model = Hurt
+        fields = ('id', 'name')
+
 class SimpleHealingSerializer(ModelSerializer):
     treatments = SimpleTreatmentSerializer(many=True)
+    hurts = SimpleHurtSerializer(many=True)
     class Meta:
         model = Healing
-        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments')
+        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments', 'hurts')
 
 
 class HealingSerializer(ModelSerializer):
@@ -188,16 +196,15 @@ class HealingViewSet(ViewSet):
         if patient_id is not None:
             healings = healings.filter(patient_id=patient_id)
 
-
-        #establish total time and count of current list after all filters are applied
+        # establish total time and count of current list after all filters are applied
         totalHealingTime = healings.aggregate(Sum('duration'))
 
         count = len(healings)
 
-        if page is not None: 
+        if page is not None:
             healings = paginate(healings, page, page_size)
 
-        # serialize paginated healings     
+        # serialize paginated healings
         healinglist = SimpleHealingSerializer(
             healings, many=True, context={'request': request})
 
@@ -212,7 +219,7 @@ class HealingViewSet(ViewSet):
         """ Access a single Healing """
         try:
             healing = Healing.objects.get(pk=pk)
-            healing.owner = False 
+            healing.owner = False
             if healing.patient == Patient.objects.get(user=request.auth.user):
                 healing.owner = True
             serializer = HealingSerializer(
