@@ -166,6 +166,8 @@ class HealingViewSet(ViewSet):
 
     def list(self, request):
         """ Access a list of some/all Healings """
+        requesting_user =  request.auth.user
+        requesting_patient = Patient.objects.get(user=requesting_user)
 
         # order by date descending (newest first) by default
         healings = Healing.objects.all().order_by('-added_on')
@@ -194,7 +196,12 @@ class HealingViewSet(ViewSet):
 
         # e.g. /healings?patient_id=1
         if patient_id is not None:
-            healings = healings.filter(patient_id=patient_id)
+                if int(patient_id) == requesting_patient.id or requesting_user.is_staff == True:
+                        healings = healings.filter(patient_id=patient_id)
+                else:
+                    return Response({'message': 'only staff or the patient with this id can access this list'}, status=status.HTTP_401_UNAUTHORIZED)
+        elif requesting_user.is_staff == False:
+            return Response({'message': 'only staff can access a list of healings not specified by patient id'}, status=status.HTTP_401_UNAUTHORIZED)
 
         # establish total time and count of current list after all filters are applied
         totalHealingTime = healings.aggregate(Sum('duration'))
@@ -224,7 +231,7 @@ class HealingViewSet(ViewSet):
                 healing.owner = True
             serializer = HealingSerializer(
                 healing, context={'request': request})
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Healing.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 
