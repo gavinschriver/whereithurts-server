@@ -195,6 +195,11 @@ class HealingViewSet(ViewSet):
             healings = healings.order_by(order_filter)
 
         # e.g. /healings?patient_id=1
+        # if patient_id exists, only filter/continue with request if the
+        # value from that querystring is equal to the id of the requesting user OR
+        # the requester is staff
+    
+        #otherwise (no patient id in querystring), only allow staff to access the list
         if patient_id is not None:
                 if int(patient_id) == requesting_patient.id or requesting_user.is_staff == True:
                         healings = healings.filter(patient_id=patient_id)

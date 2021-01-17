@@ -25,8 +25,8 @@ class HealingTests(APITestCase):
         # parse JSON from API's response
         json_response = json.loads(response.content)
 
-        # store auth token
-        self.token = json_response["token"]
+        # store staff auth token
+        self.staff_token = json_response["token"]
 
         # Assert that a user was created
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -45,6 +45,7 @@ class HealingTests(APITestCase):
             last_name="seconduser"
         )
 
+        # store non-staff token
         self.second_users_token = Token.objects.create(user=secondUser).key
 
         second_patient = Patient.objects.create(
@@ -139,7 +140,7 @@ class HealingTests(APITestCase):
             "treatment_ids": [1],
             "hurt_ids": [2]
         }
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.staff_token)
         response = self.client.post(url, data, format='json')
 
         json_response = json.loads(response.content)
@@ -179,7 +180,7 @@ class HealingTests(APITestCase):
 
         url = "/healings"
 
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.staff_token)
         response = self.client.get(url)
 
         json_response = json.loads(response.content)
@@ -207,25 +208,42 @@ class HealingTests(APITestCase):
 
         json_response = json.loads(response.content)
         self.assertEqual(len(json_response["healings"]), 1)
-    
-    def test_try_to_access_healings_by_non_owner_id_not_as_staff(self):
-        #create a healing as the staff user, then have the second user try to access the list with a the staff user's patient id
+        self.assertEqual(json_response["count"], 1)
+        self.assertEqual(json_response["total_healing_time"], 1000)
+
+    def test_try_to_access_healings_by_patient_id_not_as_owner_or_staff(self):
+        # create a healing with staff user as patient, then have the second user try to access the list with a the staff user's patient id
         staff_healing = Healing()
         staff_healing.patient_id = 1
         staff_healing.duration = 1000
-        staff_healing.notes = "staff person owns this" 
-        staff_healing.added_on = timezone.now()  
-        staff_healing.save()    
-    
-    def test_access_healings_by_patient_id_as_staff(self):
-        #make sure a staff member can see any patient's id
-        pass
+        staff_healing.notes = "staff person owns this"
+        staff_healing.added_on = timezone.now()
+        staff_healing.save()
 
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token ' + self.second_users_token)
+        response = self.client.get("/healings?patient_id=1")
+        json_response = json.loads(response.content)
+        self.assertEqual(
+            json_response["message"], 'only staff or the patient with this id can access this list')
+
+    def test_access_healings_by_patient_id_as_staff(self):
+
+        """make sure a staff member can see any patient's healings by id"""
+
+        # create a single healing as the second user
+        self.test_create_healing_with_one_treatment_and_one_hurt_as_second_user()
+        
+        # access the second user's healing info as staff user
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token ' + self.staff_token)
+        response = self.client.get("/healings?patient_id=2")
+        json_response = json.loads(response.content)
+        self.assertEqual(len(json_response["healings"]), 1)
+        self.assertEqual(json_response["total_healing_time"], 1000)
+        self.assertEqual(json_response["count"], 1)
 
 # To do:
-# --add method for another healing
-# make sure only is_staff users can access an entire list of healings
-# make sure only requesting patient can view their healings (make a second user)
 # -- delete single Healing (check for 404)
 # -- udpate single Healing
 
