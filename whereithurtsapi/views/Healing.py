@@ -12,16 +12,24 @@ from django.db.models import Sum
 
 # Serializers
 
+
 class SimpleTreatmentSerializer(ModelSerializer):
-    class Meta: 
+    class Meta:
         model = Treatment
         fields = ('id', 'name', 'notes')
 
+
+class SimpleHurtSerializer(ModelSerializer):
+    class Meta:
+        model = Hurt
+        fields = ('id', 'name')
+
 class SimpleHealingSerializer(ModelSerializer):
     treatments = SimpleTreatmentSerializer(many=True)
+    hurts = SimpleHurtSerializer(many=True)
     class Meta:
         model = Healing
-        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments')
+        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments', 'hurts')
 
 
 class HealingSerializer(ModelSerializer):
@@ -71,8 +79,8 @@ class HealingViewSet(ViewSet):
 
         try:
             hurts = [Hurt.objects.get(pk=hurt_id) for hurt_id in hurt_ids]
-        except Treatment.DoesNotExist:
-            return Response({'message': 'request contains a treatment id for a non-existent treatment'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        except Hurt.DoesNotExist:
+            return Response({'message': 'request contains a hurt id for a non-existent hurt'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         # Try to save the new Healing to the database
         try:
@@ -92,7 +100,7 @@ class HealingViewSet(ViewSet):
 
         # serialize the new healing and send it back
         serialzier = HealingSerializer(healing, context={'request': request})
-        return Response(serialzier.data)
+        return Response(serialzier.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, pk=None):
         """ Handle an update request for a Healing
@@ -158,6 +166,8 @@ class HealingViewSet(ViewSet):
 
     def list(self, request):
         """ Access a list of some/all Healings """
+        requesting_user =  request.auth.user
+        requesting_patient = Patient.objects.get(user=requesting_user)
 
         # order by date descending (newest first) by default
         healings = Healing.objects.all().order_by('-added_on')
@@ -185,19 +195,28 @@ class HealingViewSet(ViewSet):
             healings = healings.order_by(order_filter)
 
         # e.g. /healings?patient_id=1
+        # if patient_id exists, only filter/continue with request if the
+        # value from that querystring is equal to the id of the requesting user OR
+        # the requester is staff
+    
+        #otherwise (no patient id in querystring), only allow staff to access the list
         if patient_id is not None:
-            healings = healings.filter(patient_id=patient_id)
+                if int(patient_id) == requesting_patient.id or requesting_user.is_staff == True:
+                        healings = healings.filter(patient_id=patient_id)
+                else:
+                    return Response({'message': 'only staff or the patient with this id can access this list'}, status=status.HTTP_401_UNAUTHORIZED)
+        elif requesting_user.is_staff == False:
+            return Response({'message': 'only staff can access a list of healings not specified by patient id'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-        #establish total time and count of current list after all filters are applied
+        # establish total time and count of current list after all filters are applied
         totalHealingTime = healings.aggregate(Sum('duration'))
 
         count = len(healings)
 
-        if page is not None: 
+        if page is not None:
             healings = paginate(healings, page, page_size)
 
-        # serialize paginated healings     
+        # serialize paginated healings
         healinglist = SimpleHealingSerializer(
             healings, many=True, context={'request': request})
 
@@ -212,12 +231,12 @@ class HealingViewSet(ViewSet):
         """ Access a single Healing """
         try:
             healing = Healing.objects.get(pk=pk)
-            healing.owner = False 
+            healing.owner = False
             if healing.patient == Patient.objects.get(user=request.auth.user):
                 healing.owner = True
             serializer = HealingSerializer(
                 healing, context={'request': request})
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except Healing.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
 

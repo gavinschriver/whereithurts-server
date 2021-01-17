@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt
 from whereithurtsapi.models import Patient
+from rest_framework import status
+
 
 @csrf_exempt
 def login_user(request):
@@ -16,14 +18,13 @@ def login_user(request):
 
     req_body = json.loads(request.body.decode())
 
-
     if request.method == 'POST':
 
         # Verify all required fields are present
-        required_fields = [ 'username', 'password' ]        
+        required_fields = ['username', 'password']
         for field in required_fields:
             if not field in req_body:
-                return HttpResponseBadRequest(json.dumps({ "message": f"Field `{field}` is required." }))
+                return HttpResponseBadRequest(json.dumps({"message": f"Field `{field}` is required."}))
         username = req_body['username']
         password = req_body['password']
         authenticated_user = authenticate(username=username, password=password)
@@ -31,7 +32,8 @@ def login_user(request):
         if authenticated_user is not None:
             token = Token.objects.get(user=authenticated_user)
             patient = Patient.objects.get(user=authenticated_user)
-            data = json.dumps({"valid": True, "token": token.key, "patient_id": patient.id})
+            data = json.dumps(
+                {"valid": True, "token": token.key, "patient_id": patient.id})
             return HttpResponse(data, content_type='application/json')
 
         else:
@@ -51,10 +53,11 @@ def register_user(request):
         req_body = json.loads(request.body.decode())
 
         # Verify all required values are present
-        required_fields = [ 'username', 'email', 'password', 'firstname', 'lastname' ]
+        required_fields = ['username', 'email',
+                           'password', 'firstname', 'lastname']
         for field in required_fields:
             if not field in req_body:
-                return HttpResponseBadRequest(json.dumps({ "message": f"Field `{field}` is required." }))
+                return HttpResponseBadRequest(json.dumps({"message": f"Field `{field}` is required."}))
 
         # Create a new User via the create_user helper method from Django's User model
         new_user = User.objects.create_user(
@@ -75,5 +78,6 @@ def register_user(request):
         token = Token.objects.create(user=new_user)
 
         # Return the token to the client
-        data = json.dumps({"valid": True, "token": token.key, "patient_id": patient.id})
-        return HttpResponse(data, content_type="application/json")
+        data = json.dumps(
+            {"valid": True, "token": token.key, "patient_id": patient.id, "is_staff": new_user.is_staff})
+        return HttpResponse(data, content_type="application/json", status=status.HTTP_201_CREATED)
