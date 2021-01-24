@@ -8,6 +8,7 @@ class Healing(models.Model):
     notes = models.CharField(max_length=300)
     duration = models.IntegerField()
     added_on = models.DateTimeField()
+    intensity = models.IntegerField(default=0)
 
     @property
     def treatments(self):
