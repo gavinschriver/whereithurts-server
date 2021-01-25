@@ -1,8 +1,9 @@
 import json
+from whereithurtsapi.models.HurtTreatment import HurtTreatment
 from whereithurtsapi.models.Healing import Healing
 from rest_framework import status
 from rest_framework.test import APITestCase
-from whereithurtsapi.models import Treatment, Hurt, TreatmentType, Bodypart, Update, Patient
+from whereithurtsapi.models import Treatment, Hurt, TreatmentType, Bodypart, Update, Patient, HealingTreatment, HurtHealing
 from django.utils import timezone
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -97,7 +98,8 @@ class HealingTests(APITestCase):
             "duration": 1000,
             "notes": "great healing!!",
             "treatment_ids": [1],
-            "hurt_ids": [1]
+            "hurt_ids": [1],
+            "intensity": 7
         }
 
         # make sure request is authenticated
@@ -110,6 +112,7 @@ class HealingTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(json_response["duration"], 1000)
         self.assertEqual(json_response["notes"], "great healing!!")
+        self.assertEqual(json_response["intensity"], 7)
         self.assertEqual(len(json_response["hurts"]), 1)
         self.assertEqual(len(json_response["treatments"]), 1)
 
@@ -212,7 +215,7 @@ class HealingTests(APITestCase):
         self.assertEqual(json_response["total_healing_time"], 1000)
 
     def test_try_to_access_healings_by_patient_id_not_as_owner_or_staff(self):
-        # create a healing with staff user as patient, then have the second user try to access the list with a the staff user's patient id
+        # create a healing with staff user as patient, then have the second user try to access the list with the staff user's patient id as a query param
         staff_healing = Healing()
         staff_healing.patient_id = 1
         staff_healing.duration = 1000
@@ -242,6 +245,61 @@ class HealingTests(APITestCase):
         self.assertEqual(len(json_response["healings"]), 1)
         self.assertEqual(json_response["total_healing_time"], 1000)
         self.assertEqual(json_response["count"], 1)
+    
+    def test_update_single_healing(self):
+
+        """create a healing instance in the database as staff user, then send a PUT request to change its values """
+
+        # create healing
+        timestamp = timezone.now()
+    
+        healing = Healing()
+        healing.patient_id = 1
+        healing.duration = 1000
+        healing.intensity = 8
+        healing.notes = "really good healing very intense"
+        healing.added_on = timestamp
+        healing.save()
+
+        #create a HurtHealing to associated with Healing
+        hurthealing = HurtHealing()
+        hurthealing.hurt_id = 1
+        hurthealing.healing_id = healing.id
+        hurthealing.save()
+
+        #create a HealingTreatment to associate with Healing
+        healingtreatment = HealingTreatment()
+        healingtreatment.treatment_id = 1
+        healingtreatment.healing_id = healing.id
+        healingtreatment.save()
+
+        # emulate a PUT request that changes all basic properties besides added_on and also 
+        # removes the assocaited hurt and treatment
+        data = {
+            "duration": 500,
+            "intensity": 4,
+            "notes": "actually not so good",
+            "treatment_ids": [],
+            "hurt_ids": []
+        }
+
+        url = f"/healings/{healing.id}"
+
+        self.client.credentials(
+            HTTP_AUTHORIZATION='Token ' + self.staff_token)
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        response = self.client.get(url)
+
+        json_response = json.loads(response.content)
+
+        self.assertEqual(json_response["duration"], 500)
+        self.assertEqual(json_response["notes"], "actually not so good")
+        self.assertEqual(json_response["intensity"], 4)
+        self.assertEqual(len(json_response["hurts"]), 0)
+        self.assertEqual(len(json_response["treatments"]), 0)
+
 
 # To do:
 # -- delete single Healing (check for 404)

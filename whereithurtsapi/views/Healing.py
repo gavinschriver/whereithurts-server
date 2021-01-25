@@ -29,7 +29,7 @@ class SimpleHealingSerializer(ModelSerializer):
     hurts = SimpleHurtSerializer(many=True)
     class Meta:
         model = Healing
-        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments', 'hurts')
+        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments', 'hurts', 'intensity')
 
 
 class HealingSerializer(ModelSerializer):
@@ -40,7 +40,7 @@ class HealingSerializer(ModelSerializer):
     class Meta:
         model = Healing
         fields = ('id', 'patient', 'notes', 'duration',
-                  'added_on', 'treatments', 'hurts', 'date_added', 'owner')
+                  'added_on', 'treatments', 'hurts', 'date_added', 'owner', 'intensity')
         depth = 1
 
 # Viewset
@@ -61,8 +61,10 @@ class HealingViewSet(ViewSet):
         healing.patient = patient
 
         # assign basic model values from request body
+        #assign a default value of 
         healing.notes = request.data["notes"]
         healing.duration = request.data["duration"]
+        healing.intensity = request.data.setdefault('intensity', 0)
         healing.added_on = timezone.now()
 
         # extract treatment ids from request and try to convert that collection to a queryset of Treatment instances
@@ -114,6 +116,8 @@ class HealingViewSet(ViewSet):
         # save basic model values from request body
         healing.notes = request.data["notes"]
         healing.duration = request.data["duration"]
+        healing.intensity = request.data.setdefault('intensity', 0)
+
 
         # extract treatment ids from request and try to convert that collection to a queryset of Treatment instances
         treatment_ids = request.data["treatment_ids"]
