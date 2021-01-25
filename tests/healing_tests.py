@@ -99,7 +99,7 @@ class HealingTests(APITestCase):
             "notes": "great healing!!",
             "treatment_ids": [1],
             "hurt_ids": [1],
-            "intensity": 7
+            "intensity": 77
         }
 
         # make sure request is authenticated
@@ -112,9 +112,10 @@ class HealingTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(json_response["duration"], 1000)
         self.assertEqual(json_response["notes"], "great healing!!")
-        self.assertEqual(json_response["intensity"], 7)
+        self.assertEqual(json_response["intensity"], 77)
         self.assertEqual(len(json_response["hurts"]), 1)
         self.assertEqual(len(json_response["treatments"]), 1)
+        self.assertEqual(json_response["intensity_score"], 80)
 
     def test_try_to_create_healing_with_nonexisting_treatment(self):
         url = "/healings"
@@ -256,7 +257,7 @@ class HealingTests(APITestCase):
         healing = Healing()
         healing.patient_id = 1
         healing.duration = 1000
-        healing.intensity = 8
+        healing.intensity = 83
         healing.notes = "really good healing very intense"
         healing.added_on = timestamp
         healing.save()
@@ -277,7 +278,7 @@ class HealingTests(APITestCase):
         # removes the assocaited hurt and treatment
         data = {
             "duration": 500,
-            "intensity": 4,
+            "intensity": 47,
             "notes": "actually not so good",
             "treatment_ids": [],
             "hurt_ids": []
@@ -296,7 +297,8 @@ class HealingTests(APITestCase):
 
         self.assertEqual(json_response["duration"], 500)
         self.assertEqual(json_response["notes"], "actually not so good")
-        self.assertEqual(json_response["intensity"], 4)
+        self.assertEqual(json_response["intensity"], 47)
+        self.assertEqual(json_response["intensity_score"], 50)
         self.assertEqual(len(json_response["hurts"]), 0)
         self.assertEqual(len(json_response["treatments"]), 0)
 
