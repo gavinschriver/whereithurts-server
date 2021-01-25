@@ -29,7 +29,8 @@ class SimpleHealingSerializer(ModelSerializer):
     hurts = SimpleHurtSerializer(many=True)
     class Meta:
         model = Healing
-        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments', 'hurts', 'intensity')
+        fields = ('id', 'date_added', 'added_on', 'duration', 'treatments', 'hurts', 'intensity', 'intensity_score'
+    )
 
 
 class HealingSerializer(ModelSerializer):
@@ -40,7 +41,7 @@ class HealingSerializer(ModelSerializer):
     class Meta:
         model = Healing
         fields = ('id', 'patient', 'notes', 'duration',
-                  'added_on', 'treatments', 'hurts', 'date_added', 'owner', 'intensity')
+                  'added_on', 'treatments', 'hurts', 'date_added', 'owner', 'intensity', 'intensity_score')
         depth = 1
 
 # Viewset
