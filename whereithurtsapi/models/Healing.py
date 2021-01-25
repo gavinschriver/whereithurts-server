@@ -8,6 +8,7 @@ class Healing(models.Model):
     notes = models.CharField(max_length=300)
     duration = models.IntegerField()
     added_on = models.DateTimeField()
+    intensity = models.IntegerField(default=0)
 
     @property
     def treatments(self):
@@ -22,6 +23,10 @@ class Healing(models.Model):
     @property
     def date_added(self):
         return self.added_on.strftime('%-m/%d/%Y')
+    
+    @property
+    def intensity_score(self):
+        return round(self.intensity/10) * 10
 
     @property 
     def owner(self):
@@ -30,3 +35,5 @@ class Healing(models.Model):
     @owner.setter
     def owner(self, value):
         self._owner = value
+
+    
